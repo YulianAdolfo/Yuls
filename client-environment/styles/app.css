@@ -1,0 +1,116 @@
+.app-container {
+    width: 800px;
+    height: 450px;
+    background-color:white;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border:1px solid #ddd;
+    border-radius: 10px;
+}
+.app-container h1 {
+    margin: 0;
+    font-size: 30px;
+    text-align: center;
+    color: white;
+}
+.app-container header {
+    width: 100%;
+    height: 40px;
+    background-color: #00adef;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.app-container header i {
+    position: absolute;
+    font-size: 35px;
+    margin-left: 10px;
+    margin-top: 2px;
+    color:white;
+    cursor: pointer;
+}
+.app-container form {
+    width: 100%;
+    position:absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+.app-container form input[type="text"] {
+    width: 90%;
+    height: 25px;
+    padding: 5px;
+    margin-top: 5px;
+    font-size: 15px;
+    outline: none;
+    margin-right: 0;
+    border-radius: 5px;
+    margin-left: 40px;
+    border: 1px solid rgb(177, 177, 177);
+    padding-left: 10px;
+}
+.app-container form input[type="text"]:nth-of-type(1) {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    width: 78%;
+}
+.app-container form select {
+    width: 96px;
+    height: 37px;
+    font-size: 15px;
+    margin-left:-5px;
+    padding: 0; 
+    outline: none;
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid rgb(177, 177, 177);
+}
+.app-container input[type="date"] {
+    outline: none;
+    text-align: center;
+    padding: 5px;
+    width: 20%;
+    font-size: 15px;
+    display: block;
+    margin-left: 40px;
+    margin-top: 20px;
+    border-radius: 5px;
+    border: 1px solid rgb(177, 177, 177);
+}
+.app-container input[type="submit"] {
+    display: block;
+    margin:  0 auto;
+    margin-top: 40px;
+    width:250px;
+    font-size: 18px;
+    padding: 6px;
+    cursor: pointer;
+    background-color: rgb(30, 219, 5);
+    border: none;
+    outline: none;
+    color: white;
+    border-radius: 5px;
+}
+.app-container input[type="submit"]:hover {
+    background-color: rgb(29, 199, 6);
+}
+.app-container span {
+    margin-left: 40px;
+    margin-top: 25px;
+    margin-right: 10px;
+    font-size: 17px;
+    float: left;
+}
+.app-container form input[type="checkbox"] {
+    width: 20px;
+    margin-left: 40px;
+    margin-top: 20px;   
+    cursor: pointer;
+}
+.app-container form  label {
+    cursor: pointer;
+    font-size: 17px;
+    margin-top: 25px;
+    display: inline-block;
+}

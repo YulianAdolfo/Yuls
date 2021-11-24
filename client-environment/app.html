@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
+    <link rel="stylesheet" href="./styles/app.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="app-container">
+        <header><i class="fas fa-bars"></i><h1>Panel de registro</h1></header>
+        <form action="#">
+            <input type="text" placeholder="Número de documento">
+            <select name="type-id" id="type-id">
+                <option value="0">CC</option>
+                <option value="1">TI</option>
+                <option value="2">CE</option>
+                <option value="3">ASI</option>
+                <option value="5">CI</option>
+                <option value="6">MSI</option>
+                <option value="7">NU</option>
+                <option value="8">PA</option>
+                <option value="9">PE</option>
+                <option value="10">RC</option>
+                <option value="11">RI</option>
+            </select>
+            <input type="text" placeholder="Nombres del paciente">
+            <input type="text" placeholder="Apellidos del paciente">
+            <span>Fecha de registro</span><input type="date" name="" id="">
+            <input type="checkbox" name="error-check" id="error-check">
+            <label for="error-check">El paciente presenta errores</label>
+            <input type="submit" value="Registrar">
+        </form>
+    </div>
+</body>
+</html>
