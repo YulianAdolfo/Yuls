@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"html/template"
+	"io/ioutil"
+	"net/http"
 	"time"
 )
 
@@ -17,16 +20,12 @@ type dataPatientHC struct {
 	TypeId             string
 	HasError           bool
 }
-
 const (
 	DATABASE_IN_USE = "clinic_history_Test"
 )
 
 // insert new patients
-func newClinicHistory(data []byte) {
-	var dataPatienStruct dataPatientHC
-	json.Unmarshal(data, &dataPatienStruct)
-	fmt.Println(dataPatienStruct.ActualDateRegistry)
+func newClinicHistory(dataPatienStruct dataPatientHC) error {
 	// connecting to database
 	connection := getConnectionDB()
 	insertQuery := "INSERT INTO " + DATABASE_IN_USE + " (actualDateRegistry, dateClinicHistory, IdPatient, patientNames, patientLastnames, typeId, hasError) VALUES (?,?,?,?,?,?,?)"
@@ -35,38 +34,41 @@ func newClinicHistory(data []byte) {
 	statement, err := connection.PrepareContext(contextQuery, insertQuery)
 	if err != nil {
 		fmt.Println("Error preparing the query with context " + err.Error())
-		return
+		return err
 	}
 	defer statement.Close()
 	_, err = statement.ExecContext(contextQuery, dataPatienStruct.ActualDateRegistry, dataPatienStruct.DateClinicHistory, dataPatienStruct.IdPatient, dataPatienStruct.PatientNames, dataPatienStruct.PatientLastnames, dataPatienStruct.TypeId, dataPatienStruct.HasError)
 	if err != nil {
 		fmt.Println("Error executing the context " + err.Error())
-		return
+		return err
 	}
 	defer connection.Close()
+	fmt.Println("success")
 
+	return err
 }
-func registry() {
-	data := getContentBody()
-	newClinicHistory(data)
-}
-func getContentBody() []byte {
-	var dataPatientHc dataPatientHC
-	dataPatientHc.ActualDateRegistry = time.Now().String()
-	dataPatientHc.DateClinicHistory = "2021-10-12"
-	dataPatientHc.PatientNames = "Yulian Adolfo"
-	dataPatientHc.PatientLastnames = "Rojas Gañan"
-	dataPatientHc.TypeId = "CC"
-	dataPatientHc.IdPatient = 1007441849
-	dataPatientHc.HasError = true
+func setPatientRecord(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		bodyRequest, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			fmt.Println("Error reading the body: " + err.Error())
+		}
+		var dataPatientHc dataPatientHC
+		json.Unmarshal(bodyRequest, &dataPatientHc)
+		dataPatientHc.ActualDateRegistry = time.Now().String() // getting the actual date
+		err = newClinicHistory(dataPatientHc)                  // function to insert new records
 
-	jsonContent, err := json.Marshal(dataPatientHc)
-	if err != nil {
-		fmt.Println("Error marshalling in getContentBody: " + err.Error())
 	}
-	return jsonContent
+}
+func app(w http.ResponseWriter, r *http.Request) {
+	appTemplate := template.Must(template.ParseFiles("../client-environment/app.html"))
+	appTemplate.Execute(w, nil)
 }
 func main() {
+	publicElementsApp := http.FileServer(http.Dir("../public"))
+	http.Handle("/public/", http.StripPrefix("/public/", publicElementsApp))
 	fmt.Println("Using the database: " + DATABASE_IN_USE)
-	registry()
+	http.HandleFunc("/record-patient", setPatientRecord)
+	http.HandleFunc("/Yuls", app)
+	http.ListenAndServe(":8005", nil)
 }
