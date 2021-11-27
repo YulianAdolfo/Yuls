@@ -12,10 +12,14 @@ var app = document.getElementById("app-container")
 
 
 //const IP_SERVER = "http://192.168.11.105:8005/"
-
 IdPatientBox.onchange = async () => {
     var id = parseInt(IdPatientBox.value)   
     if (!isNaN(id)) {
+        var stateMessage = " | consultando..."
+        IdPatientBox.disabled = true
+        IdPatientBox.style.backgroundColor = "rgba(1, 172, 240)"
+        IdPatientBox.style.color = "white"
+        IdPatientBox.value = IdPatientBox.value + stateMessage
         var getInfoPatient = await new Promise((resolved, rejected)=> {
             fetch("/get-data-patient?id-patient=" + id, {
                 method:"get"
@@ -24,8 +28,15 @@ IdPatientBox.onchange = async () => {
             .then(data => resolved(data))
             .then(error => rejected(error))
         })
-        boxNames.value = convertNameTo(getInfoPatient.FirstName.trim()) + " " + convertNameTo(getInfoPatient.SecondName.trim())
-        boxLastnames.value = convertNameTo(getInfoPatient.FirstLastname.trim()) + " " + convertNameTo(getInfoPatient.SecondLastname.trim())
+        stateMessage = ""
+        IdPatientBox.disabled = false
+        IdPatientBox.style.backgroundColor = "white"
+        IdPatientBox.style.color = "black"
+        IdPatientBox.value = id
+        if (getInfoPatient.FirstName.trim() != "" && getInfoPatient.FirstLastname.trim() != "") {
+            boxNames.value = convertNameTo(getInfoPatient.FirstName.trim()) + " " + convertNameTo(getInfoPatient.SecondName.trim())
+            boxLastnames.value = convertNameTo(getInfoPatient.FirstLastname.trim()) + " " + convertNameTo(getInfoPatient.SecondLastname.trim())
+        }
         switch(getInfoPatient.TypId.trim()) {
             case "CC":
                 typeIdPatient.value = 0
@@ -61,7 +72,7 @@ IdPatientBox.onchange = async () => {
                 typeIdPatient.value = 10
                 break;
             default:
-                typeIdPatient.value = ""
+                typeIdPatient.value = 0
                 break;
         }
     }
