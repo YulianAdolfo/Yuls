@@ -85,8 +85,7 @@ buttonSender()
 function getDiv() {
     var div = document.createElement("div")
     var i = document.createElement("i")
-    div.classList.add("alert-state")
-    i.classList.add("fas", "fa-times-circle", "close-alert")
+    i.classList.add("fas", "fa-times-circle")
     div.appendChild(i)
     return div
 }
@@ -200,17 +199,14 @@ function buttonSender() {
 }
 function stateProcessAlert(iconClass, message, backgroundColor) {
     var successfull = getDiv()
-    successfull.innerHTML += iconClass + message
-    successfull.style.backgroundColor = backgroundColor
+    var messageP =  document.createElement("p")
+    var icon = document.createElement("i")
+    icon.classList.add("fas", "fa-server")
+    messageP.innerHTML = "Error interno de servidor (Código:1000)"
+    successfull.appendChild(icon)
+    successfull.appendChild(messageP)
+    successfull.classList.add("alert-state")
     document.body.appendChild(successfull)
-    setTimeout(() => {
-        successfull.classList.remove("from-bottom-top-alert")
-        successfull.classList.add("from-top-bottom-alert")
-        setTimeout(() => {
-            successfull.classList.remove("from-top-bottom-alert")
-            successfull.classList.add("from-bottomtop-alert")
-        }, 2000);
-    }, 50);
 }
 function setFailProcessAlert()  {
     var fail = getDiv()
@@ -277,3 +273,4 @@ function convertNameTo(string) {
         return ""
     }
 }
+stateProcessAlert()
