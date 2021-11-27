@@ -1,3 +1,10 @@
+:root {
+    --color-of-success: #4BB543;
+    --color-of-fail: red;
+}
+body {
+    margin: 0 ;
+}
 .app-container {
     width: 800px;
     height: 450px;
@@ -8,7 +15,7 @@
     transform: translate(-50%, -50%);
     border:1px solid #ddd;
     border-radius: 10px;
-    overflow-x: hidden;
+    overflow:hidden;
 }
 .app-container h1 {
     margin: 0;
@@ -81,7 +88,7 @@
     border: 1px solid rgb(177, 177, 177);
     background-color: white;
 }
-.app-container input[type="submit"] {
+.app-container input[type="button"] {
     display: block;
     margin:  0 auto;
     margin-top: 40px;
@@ -95,7 +102,7 @@
     color: white;
     border-radius: 5px;
 }
-.app-container input[type="submit"]:hover {
+.app-container input[type="button"]:hover {
     background-color: rgb(29, 199, 6);
 }
 .app-container span {
@@ -166,4 +173,33 @@
 .show-win-menu {
     transform: translateX(0%);
     transition: 1s;
+}
+.alert-state {
+    width: 98%;
+    height: 20px;
+    display: block;
+    margin: 0 auto;
+    margin-top: 2px;
+    border-radius: 5px;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    font-size: 18px;
+    transform: translateY(-110%);
+}
+.alert-state i {
+    margin-right: 5px;
+}
+.close-alert {
+    position: absolute; 
+    right: 10px;
+    cursor: pointer;
+}
+.from-top-bottom-alert {
+    transform: translateY(0%);
+    transition: .3s linear;
+}
+.from-bottom-top-alert {
+    transform: translateY(-110%);
+    transition: .3s linear;
 }
