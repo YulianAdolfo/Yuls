@@ -9,8 +9,76 @@ var IdPatientBox = document.getElementById("id-patient")
 var typeIdPatient = document.getElementById("type-id")
 var buttonSubmit = document.getElementById("button-submit")
 var app = document.getElementById("app-container")
+var generateReportButton = document.getElementById("report-info")
 
+function getOnlyDiv() {
+    var div = document.createElement("div")
+    var header = document.createElement("header")
+    div.style.width = "100%"
+    div.style.height = "100%"
+    div.style.backgroundColor = "white"
+    div.style.position = "absolute"
+    div.style.left = "0"
+    div.style.top = "0"
+    header.style.width = "100%"
+    div.appendChild(header)
+    app.appendChild(div)
+    buttonCloseMenu.click()
+    return div
+}
+function getButtons() {
+    var button = document.createElement("button")
+    button.style.width = "200px"
+    button.style.height = "30px"
+    button.style.backgroundColor = "rgb(30, 219, 5)"
+    return button
+}
+function getInputDate() {
+    var date = document.createElement("input")
+    date.type = "date"
+    date.style.textAlign = "center"
+    return date
+}
+function getSpan() {
+    var span = document.createElement("span")
+    return span
+}
+function getSelect() {
+    return document.createElement("select")
+}
+function getOptions() {
+    return document.createElement("option")
+}
+generateReportButton.onclick = () => {
+    var div = getOnlyDiv()
+    div.classList.add("box-generate-info")
+    var date1 = getInputDate()
+    var date2 = getInputDate()
+    var select = getSelect()
+    var item1 = getOptions()
+    var item2 = getOptions()
 
+    item1.innerHTML = "Fecha de historia"
+    item2.innerHTML = "Fecha de registro"
+    select.appendChild(item1)
+    select.appendChild(item2)
+    select.classList.add("select-of-report")
+    var button = getButtons()
+    div.children[0].innerHTML = "<i class='fas fa-arrow-left' id='return-arrow'></i>" + "Generación de reporte"
+    div.appendChild(getSpan()).innerHTML = "Fecha inicio"
+    div.appendChild(date1)
+    div.appendChild(getSpan()).innerHTML = "Fecha fin"
+    div.appendChild(date2)
+    div.appendChild(getSpan()).innerHTML = "Generar por"
+    div.appendChild(select)
+    div.appendChild(button).innerHTML = "Generar reporte"
+    document.getElementById("return-arrow").onclick = () => deleteActualWin(app, div)
+    app.style.height = "280px"
+}  
+function deleteActualWin(app, div) {
+    app.removeChild(div)
+    app.style.height = "450px "
+}
 //const IP_SERVER = "http://192.168.11.105:8005/"
 IdPatientBox.onchange = async () => {
     var id = parseInt(IdPatientBox.value)   
