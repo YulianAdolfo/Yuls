@@ -4,6 +4,8 @@
 }
 body {
     margin: 0 ;
+    padding: 0;
+    overflow: hidden;
 }
 .app-container {
     width: 800px;
@@ -177,10 +179,17 @@ body {
 .alert-state {
     width: 450px;
     height: 40px;
-    background-color: red;
     position: absolute;
     right: 10px;
     top: 5px;   
+}
+.transition-show {
+    transform: translateX(110%);
+    transition: .5 linear;
+}
+.transition-hide {
+    transform: translateX(0%);
+    transition: .5s ease-out;
 }
 .alert-state i:nth-child(1) {
     position: absolute;
