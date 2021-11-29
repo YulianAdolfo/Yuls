@@ -229,3 +229,45 @@ body {
     transform: translateY(-110%);
     transition: .3s linear;
 } */
+.box-generate-info input[type="date"], .select-of-report{
+    width: 70%;
+    float: right;
+    margin-right: 10px;
+}
+.box-generate-info header {
+    text-align: center;
+    color: white;
+    font-size: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.box-generate-info header i {
+    position: absolute;
+    left: 10px;
+    font-size: 25px;
+}
+.box-generate-info button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 180px;
+    border: none;
+    outline: none;
+    color: white;
+    border-radius: 5px;
+    font-size: 17px;
+    cursor: pointer;
+}
+.box-generate-info span {
+    font-size: 19px;
+}
+.select-of-report {
+    width: 71%;
+    margin-top: 10px;
+    font-size: 15px;
+    text-align: center;
+    border: 1px solid #ddd;
+    padding: 5px;
+    outline: none;
+    cursor: pointer;
+}
