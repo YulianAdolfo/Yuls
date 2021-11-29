@@ -33,47 +33,14 @@ IdPatientBox.onchange = async () => {
         IdPatientBox.style.backgroundColor = "white"
         IdPatientBox.style.color = "black"
         IdPatientBox.value = id
-        if (getInfoPatient.FirstName.trim() != "" && getInfoPatient.FirstLastname.trim() != "") {
-            boxNames.value = convertNameTo(getInfoPatient.FirstName.trim()) + " " + convertNameTo(getInfoPatient.SecondName.trim())
-            boxLastnames.value = convertNameTo(getInfoPatient.FirstLastname.trim()) + " " + convertNameTo(getInfoPatient.SecondLastname.trim())
-        }
-        switch(getInfoPatient.TypId.trim()) {
-            case "CC":
-                typeIdPatient.value = 0
-                break;
-            case "TI":
-                typeIdPatient.value = 1
-                break;
-            case "CE":
-                typeIdPatient.value = 2
-                break;
-            case "ASI":
-                typeIdPatient.value = 3
-                break;
-            case "CI":
-                typeIdPatient.value = 4
-                break;
-            case "MSI":
-                typeIdPatient.value = 5
-                break;
-            case "NU":
-                typeIdPatient.value = 6
-                break;
-            case "PA":
-                typeIdPatient.value = 7
-                break;
-            case "PE":
-                typeIdPatient.value = 8
-                break;
-            case "RC":
-                typeIdPatient.value = 9
-                break;
-            case "RI":
-                typeIdPatient.value = 10
-                break;
-            default:
-                typeIdPatient.value = 0
-                break;
+        if (getInfoPatient.Names != "" && getInfoPatient.Lastnames != "") {
+            boxNames.value = getInfoPatient.Names
+            boxLastnames.value = getInfoPatient.Lastnames
+            typeIdPatient.value = getInfoPatient.TypId
+        }else {
+            boxNames.value = ""
+            boxLastnames.value = ""
+            stateProcessAlert("fa-address-book", "Sin registros en nuestro sistema interno", "rgb(243, 98, 1)")   
         }
     }
 }
@@ -160,10 +127,6 @@ function buttonSender() {
             var sendRecord = JSON.stringify(recordDataPatient)
     
             async function sendRecordToServer() {
-                IdPatientBox.value  = ""
-                boxNames.value = ""
-                boxLastnames.value = ""
-                checkboxError.value = ""
                 // setting the loading progress
                 onprogressRequest()
                 // sending the data
@@ -182,31 +145,50 @@ function buttonSender() {
                 })
                 stateRecord = stateRecord.ContenMessage
                 if (stateRecord.includes("Error 1062") || stateRecord.includes("Duplicate entry")) {
-                    console.log("El usuario ya existe. Se ha denegado el registro")
+                    stateProcessAlert("fa-user-times","Usuario existente, se ha denegado el registro", "red")
+                }else if(stateRecord.includes("dial tcp: i/o timeout")) {
+                    stateProcessAlert("fa-user-times","Lo sentimos, inténtelo nuevamente (dial/tcp)", "red")
                 }else {
                     if(stateRecord == "successfull") {
-                        console.log("Exitoso!")
+                        stateProcessAlert("fa-user-check", "Registro éxitoso", "limegreen")
                     }
                 }
+                IdPatientBox.value  = ""
+                boxNames.value = ""
+                boxLastnames.value = ""
+                checkboxError.value = ""
                 buttonSender()
                 removeLastElement()
             }
             sendRecordToServer()
         }else {
-            console.log("faltan campos")
+            stateProcessAlert("fa-info-circle", "Faltan campos por llenar, por favor verifique", "orange")
         }
     }
 }
 function stateProcessAlert(iconClass, message, backgroundColor) {
-    var successfull = getDiv()
-    var messageP =  document.createElement("p")
-    var icon = document.createElement("i")
-    icon.classList.add("fas", "fa-server")
-    messageP.innerHTML = "Error interno de servidor (Código:1000)"
-    successfull.appendChild(icon)
-    successfull.appendChild(messageP)
-    successfull.classList.add("alert-state")
-    document.body.appendChild(successfull)
+        var successfull = getDiv()
+        var messageP =  document.createElement("p")
+        var icon = document.createElement("i")
+        icon.classList.add("fas", iconClass)
+        messageP.innerHTML =  message
+        successfull.style.backgroundColor = backgroundColor
+        successfull.appendChild(icon)
+        successfull.appendChild(messageP)
+        successfull.classList.add("alert-state", "transition-show")
+        document.body.appendChild(successfull)
+        setTimeout(() => {
+            successfull.classList.remove("transition-show")
+            successfull.classList.add("transition-hide")
+            setTimeout(() => {
+                successfull.classList.remove("transition-hide") 
+                successfull.style.transform = "translateX(110%)"
+                successfull.style.transition = "1s"
+                setTimeout(() => {
+                    document.body.removeChild(successfull)
+                }, 1000);
+            }, 2000);
+        }, 100);
 }
 function setFailProcessAlert()  {
     var fail = getDiv()
@@ -273,4 +255,3 @@ function convertNameTo(string) {
         return ""
     }
 }
-stateProcessAlert()
