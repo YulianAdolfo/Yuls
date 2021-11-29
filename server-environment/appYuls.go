@@ -25,10 +25,10 @@ type returnMessage struct {
 	ContenMessage string
 }
 type sqlColumnsName struct {
-	MPNom1, MPNom2, MPApe1, MPApe2, MPTDoc string
+	MPNom1, MPApe1, MPTDoc string
 }
 type resultPatientSqlServer struct {
-	FirstName, SecondName, FirstLastname, SecondLastname, TypId string
+	Names, Lastnames, TypId string
 }
 
 const (
@@ -98,7 +98,19 @@ func responseClientSucess() string {
 	}
 	return string(contentJson)
 }
-func getInfoPatientFromHosvital(id string, connectionSqlServer *sql.DB) string {
+func patientHosvital(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		idPatient := r.URL.Query().Get("id-patient")
+		data := getInfoPatientFromHosvitalTest(idPatient, sqlServerGetConnection())
+		fmt.Fprint(w, data)
+	}
+}
+func app(w http.ResponseWriter, r *http.Request) {
+	appTemplate := template.Must(template.ParseFiles("../client-environment/app.html"))
+	appTemplate.Execute(w, nil)
+}
+func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) string {
+	fmt.Println(id)
 	contextConnection := context.Background()
 	// check if the connection is alive
 	err := connectionSqlServer.PingContext(contextConnection)
@@ -107,26 +119,44 @@ func getInfoPatientFromHosvital(id string, connectionSqlServer *sql.DB) string {
 	}
 	// if the connection is alive so create the sql qery
 
-	sqlGetInfo := fmt.Sprintf("SELECT MPNom1, MPNom2, MPApe1, MPApe2, MPTDoc FROM CAPBAS WHERE MPCedu =" + "'" + id + "'")
-	fmt.Println(sqlGetInfo)
+	sqlGetInfo := fmt.Sprintf("SELECT\n" +
+		"RTRIM(CONCAT(CONCAT(LEFT(MPNom1, 1), LOWER(RIGHT(RTRIM(MPNom1), LEN(MPNom1)-1))),' ',IIF (LEN(RTRIM(MPNom2))=0,'', CONCAT(LEFT(MPNom2, 1), LOWER(RIGHT(RTRIM(MPNom2), LEN(MPNom2)-1)))))),\n+" +
+		"RTRIM(CONCAT(CONCAT(LEFT(MPApe1, 1), LOWER(RIGHT(RTRIM(MPApe1), LEN(MPApe1)-1))),' ',IIF (LEN(RTRIM(MPApe2))=0,'', CONCAT(LEFT(MPApe2, 1), LOWER(RIGHT(RTRIM(MPApe2), LEN(MPApe2)-1)))))),\n" +
+		"\n" +
+		"CASE\n" +
+		"WHEN MPTDoc = 'CC'  THEN 0 	\n" +
+		"WHEN MPTDoc = 'TI'  THEN 1 	\n" +
+		"WHEN MPTDoc = 'CE'  THEN 2 	\n" +
+		"WHEN MPTDoc = 'ASI' THEN 3 	\n" +
+		"WHEN MPTDoc = 'CI'  THEN 4 	\n" +
+		"WHEN MPTDoc = 'MSI' THEN 5 	\n" +
+		"WHEN MPTDoc = 'NU'  THEN 6 	\n" +
+		"WHEN MPTDoc = 'PA'  THEN 7 	\n" +
+		"WHEN MPTDoc = 'PE'  THEN 8 	\n" +
+		"WHEN MPTDoc = 'RC'  THEN 9 	\n" +
+		"WHEN MPTDoc = 'RI'  THEN 10 	\n" +
+		"WHEN MPTDoc = 'PEP' THEN 11 	\n" +
+		"WHEN MPTDoc = 'NIT' THEN 12	\n" +
+		"ELSE 0 						\n" +
+		"END							\n" +
+		"\n" +
+		"FROM CAPBAS WHERE MPCedu =" + "'" + id + "'")
 	rows, err := connectionSqlServer.QueryContext(contextConnection, sqlGetInfo)
 	if err != nil {
-		fmt.Println("Error executing the context to to sql server: " + err.Error())
+		fmt.Println("Error executing the context to sql server: " + err.Error())
 	}
 	defer rows.Close()
 
 	var dataResultPatientHosvital resultPatientSqlServer
 	for rows.Next() {
 		var dataSqlServer sqlColumnsName
-		err = rows.Scan(&dataSqlServer.MPNom1, &dataSqlServer.MPNom2, &dataSqlServer.MPApe1, &dataSqlServer.MPApe2, &dataSqlServer.MPTDoc)
+		err = rows.Scan(&dataSqlServer.MPNom1, &dataSqlServer.MPApe1, &dataSqlServer.MPTDoc)
 		if err != nil {
 			fmt.Println("Error scannig data from sql-server: " + err.Error())
 		}
 		// asigning values to then convert then into json
-		dataResultPatientHosvital.FirstName = dataSqlServer.MPNom1
-		dataResultPatientHosvital.SecondName = dataSqlServer.MPNom2
-		dataResultPatientHosvital.FirstLastname = dataSqlServer.MPApe1
-		dataResultPatientHosvital.SecondLastname = dataSqlServer.MPApe2
+		dataResultPatientHosvital.Names = dataSqlServer.MPNom1
+		dataResultPatientHosvital.Lastnames = dataSqlServer.MPApe1
 		dataResultPatientHosvital.TypId = dataSqlServer.MPTDoc
 	}
 	defer connectionSqlServer.Close()
@@ -134,18 +164,8 @@ func getInfoPatientFromHosvital(id string, connectionSqlServer *sql.DB) string {
 	if err != nil {
 		fmt.Println("Error marshalling the json: " + err.Error())
 	}
+	fmt.Println(string(toJsonData))
 	return string(toJsonData)
-}
-func patientHosvital(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		idPatient := r.URL.Query().Get("id-patient")
-		data := getInfoPatientFromHosvital(idPatient, sqlServerGetConnection())
-		fmt.Fprint(w, data)
-	}
-}
-func app(w http.ResponseWriter, r *http.Request) {
-	appTemplate := template.Must(template.ParseFiles("../client-environment/app.html"))
-	appTemplate.Execute(w, nil)
 }
 func main() {
 	publicElementsApp := http.FileServer(http.Dir("../public"))
