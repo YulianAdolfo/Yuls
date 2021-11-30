@@ -58,6 +58,9 @@ generateReportButton.onclick = () => {
     var item1 = getOptions()
     var item2 = getOptions()
 
+    var checkPatientErrors = createCheckboxes("patient-errors", "Generar solo pacientes con errores")
+    var checkOnlyView = createCheckboxes("only-view-info", "Solo visualizar")
+
     item1.innerHTML = "Fecha de historia"
     item2.innerHTML = "Fecha de registro"
     select.appendChild(item1)
@@ -71,13 +74,54 @@ generateReportButton.onclick = () => {
     div.appendChild(date2)
     div.appendChild(getSpan()).innerHTML = "Generar por"
     div.appendChild(select)
+    div.appendChild(checkPatientErrors)
+    div.appendChild(checkOnlyView)
     div.appendChild(button).innerHTML = "Generar reporte"
     document.getElementById("return-arrow").onclick = () => deleteActualWin(app, div)
-    app.style.height = "280px"
+    app.style.height = "380px"
+
+    button.onclick = async () => {
+        var dateStart = date1.value
+        var dateEnd = date2.value
+        if(dateStart != "" && dateEnd != "") {
+            var checkPatientError = checkPatientErrors.children[0].checked
+            var checkView = checkOnlyView.children[0].checked
+            var query = "?date-start=" + dateStart + "&date-end=" + dateEnd + "&check-only-p-errors=" + checkPatientError + "&check-only-view=" + checkView  + "&gen-by=" + select.value
+            var state = await new Promise((resolved, rejected)=> {
+                fetch("/get-information-from-patient" + query,{
+                    method:"get"  
+                })
+                .then(data => data.json())
+                .then(data => resolved(data))
+                .catch(error => rejected(error))
+            })
+            console.log(state)
+        }else {
+            stateProcessAlert("fa-info-circle", "Faltan campos por llenar, por favor verifique", "orange")
+        }
+    }
+    
+    function createCheckboxes(idCheckbox, contentLabel) {
+        var spanCheckbox = document.createElement("span")
+        var checkbox = document.createElement("input")
+        var label = document.createElement("label")
+
+        spanCheckbox.style.width = "100%"
+        checkbox.type = "checkbox"
+        checkbox.id = idCheckbox
+        label.innerHTML = contentLabel
+        label.htmlFor = idCheckbox
+        label.style.cursor = "pointer"
+
+        spanCheckbox.appendChild(checkbox)
+        spanCheckbox.appendChild(label)
+        return spanCheckbox
+    }
 }  
+generateReportButton.click()
 function deleteActualWin(app, div) {
     app.removeChild(div)
-    app.style.height = "450px "
+    app.style.height = "450px"
 }
 //const IP_SERVER = "http://192.168.11.105:8005/"
 IdPatientBox.onchange = async () => {
@@ -114,7 +158,6 @@ IdPatientBox.onchange = async () => {
 }
 function boxesForm() {
     
-
 }
 buttonSender()
 function getDiv() {
