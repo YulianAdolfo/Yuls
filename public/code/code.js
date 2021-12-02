@@ -59,7 +59,6 @@ generateReportButton.onclick = () => {
     var item2 = getOptions()
 
     var checkPatientErrors = createCheckboxes("patient-errors", "Generar solo pacientes con errores")
-    var checkOnlyView = createCheckboxes("only-view-info", "Solo visualizar")
 
     item1.innerHTML = "Fecha de historia"
     item2.innerHTML = "Fecha de registro"
@@ -77,7 +76,6 @@ generateReportButton.onclick = () => {
     div.appendChild(getSpan()).innerHTML = "Generar por"
     div.appendChild(select)
     div.appendChild(checkPatientErrors)
-    div.appendChild(checkOnlyView)
     div.appendChild(button).innerHTML = "Generar reporte"
     document.getElementById("return-arrow").onclick = () => deleteActualWin(app, div)
     app.style.height = "380px"
@@ -92,8 +90,7 @@ generateReportButton.onclick = () => {
             } else {
                 checkPatientError = 0
             }
-            var checkView = checkOnlyView.children[0].checked
-            var query = "?date-start=" + dateStart + "&date-end=" + dateEnd + "&check-only-p-errors=" + checkPatientError + "&check-only-view=" + checkView + "&gen-by=" + select.value
+            var query = "?date-start=" + dateStart + "&date-end=" + dateEnd + "&check-only-p-errors=" + checkPatientError + "&gen-by=" + select.value
             onprogressRequest()
             var state = await new Promise((resolved, rejected) => {
                 fetch("/get-information-from-patient" + query, {
