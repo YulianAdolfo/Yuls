@@ -202,7 +202,6 @@ func getReport(w http.ResponseWriter, r *http.Request) {
 		dateStart := r.URL.Query().Get("date-start")
 		dateEnd := r.URL.Query().Get("date-end")
 		checkPatientErrors := r.URL.Query().Get("check-only-p-errors")
-		_ = r.URL.Query().Get("check-only-view")
 		generateReportBy := r.URL.Query().Get("gen-by")
 
 		dataRequest, err := selectingDataToBuildReport(dateStart, dateEnd, generateReportBy, checkPatientErrors)
