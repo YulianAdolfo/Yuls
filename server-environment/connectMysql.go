@@ -21,5 +21,9 @@ func getConnectionDB() *sql.DB {
 	if err != nil {
 		fmt.Println("Error trying connection to remote database: " + err.Error())
 	}
+	err = connection.Ping()
+	if err != nil {
+		fmt.Println("Error in ping connection: " + err.Error())
+	}
 	return connection
 }
