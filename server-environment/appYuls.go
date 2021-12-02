@@ -19,7 +19,7 @@ type dataPatientHC struct {
 	PatientNames       string
 	PatientLastnames   string
 	TypeId             string
-	HasError           bool
+	HasError           string
 }
 type returnMessage struct {
 	ContenMessage string
@@ -167,12 +167,62 @@ func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) stri
 	fmt.Println(string(toJsonData))
 	return string(toJsonData)
 }
+func selectingDataToBuildReport(dateStart, dateEnd, typeDateReport, showOnlyErrors string) ([]string, error) {
+	connection := getConnectionDB()
+	query, err := connection.Query("CALL GET_REPORT(?, ?, ?, ?)", typeDateReport, dateStart, dateEnd, showOnlyErrors)
+	if err != nil {
+		fmt.Println("Error: " + err.Error())
+	}
+	var informationForReport []string
+	for query.Next() {
+		var dataReport dataPatientHC
+		err = query.Scan(&dataReport.IdPatient, &dataReport.TypeId, &dataReport.DateClinicHistory, &dataReport.ActualDateRegistry, &dataReport.PatientNames, &dataReport.PatientLastnames, &dataReport.HasError)
+		if err != nil {
+			fmt.Println("Error scannig : " + err.Error())
+		}
+		content, err := json.Marshal(dataPatientHC{
+			IdPatient:          dataReport.IdPatient,
+			TypeId:             dataReport.TypeId,
+			DateClinicHistory:  dataReport.DateClinicHistory,
+			ActualDateRegistry: dataReport.ActualDateRegistry,
+			PatientNames:       dataReport.PatientNames,
+			PatientLastnames:   dataReport.PatientLastnames,
+			HasError:           dataReport.HasError,
+		})
+		if err != nil {
+			fmt.Println("Error marshalling data: " + err.Error())
+		}
+		informationForReport = append(informationForReport, string(content))
+	}
+	defer connection.Close()
+	return informationForReport, nil
+}
+func getReport(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		dateStart := r.URL.Query().Get("date-start")
+		dateEnd := r.URL.Query().Get("date-end")
+		checkPatientErrors := r.URL.Query().Get("check-only-p-errors")
+		_ = r.URL.Query().Get("check-only-view")
+		generateReportBy := r.URL.Query().Get("gen-by")
+
+		dataRequest, err := selectingDataToBuildReport(dateStart, dateEnd, generateReportBy, checkPatientErrors)
+		if err != nil {
+			fmt.Println("Error: " + err.Error())
+		}
+		toJson, err := json.Marshal(dataRequest)
+		if err != nil {
+			fmt.Println("Error marshalling: " + err.Error())
+		}
+		fmt.Fprint(w, string(toJson))
+	}
+}
 func main() {
 	publicElementsApp := http.FileServer(http.Dir("../public"))
 	http.Handle("/public/", http.StripPrefix("/public/", publicElementsApp))
 	fmt.Println("Using the database: " + DATABASE_IN_USE)
 	http.HandleFunc("/record-patient", setPatientRecord)
 	http.HandleFunc("/get-data-patient", patientHosvital)
+	http.HandleFunc("/get-information-from-patient", getReport)
 	http.HandleFunc("/Yuls", app)
 	http.ListenAndServe(":8005", nil)
 }
