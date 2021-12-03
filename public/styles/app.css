@@ -340,7 +340,7 @@ body {
     background-color: rgba(0, 0, 0, .8);
     left: 0;
     top: 0;
-    /* display: none; */
+    display: none;
 }
 .container-info-view-patient {
     width: 90%;
