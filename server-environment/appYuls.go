@@ -8,7 +8,11 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/xuri/excelize/v2"
 )
 
 // fields in database
@@ -29,6 +33,9 @@ type sqlColumnsName struct {
 }
 type resultPatientSqlServer struct {
 	Names, Lastnames, TypId string
+}
+type setDataExcel struct {
+	DataExcel []string
 }
 
 const (
@@ -215,6 +222,91 @@ func getReport(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, string(toJson))
 	}
 }
+func reportInExcel(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		var dataExcel setDataExcel
+		contentRequest, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			fmt.Println("Error: " + err.Error())
+		}
+		json.Unmarshal(contentRequest, &dataExcel)
+		pathDownload, err := createExcelReport(dataExcel)
+		if err != nil {
+			fmt.Println("Error " + err.Error())
+		}
+		linkDownload := struct{ Link string }{Link: strings.Replace(pathDownload, "..", "", 1)}
+		if ld, err := json.Marshal(linkDownload); err != nil {
+			fmt.Println("Error marshalling link download: " + err.Error())
+		} else {
+			fmt.Fprint(w, string(ld))
+		}
+	}
+}
+func createExcelReport(contentData setDataExcel) (string, error) {
+	contentHeaders := []string{"Documento N°", "Tipo ID", "Fecha de historia", "Fecha de registro", "Nombres", "Apellidos", "¿Paciente con error?"}
+	indexColumns := []string{"A", "B", "C", "D", "E", "F", "G"}
+	columnsWidth := []float64{21.86, 10.71, 23.86, 23.86, 27, 27, 26}
+	sheetName := "Reporte_Pacientes"
+	reportInExcel := excelize.NewFile()
+	reportInExcel.NewSheet(sheetName)
+	reportInExcel.DeleteSheet("Sheet1")
+	// set headers
+	for i := 0; i < len(contentHeaders); i++ {
+		reportInExcel.SetCellValue(sheetName, indexColumns[i]+strconv.Itoa(1), contentHeaders[i])
+		reportInExcel.SetColWidth(sheetName, indexColumns[i], indexColumns[i], columnsWidth[i])
+	}
+	// creating style
+	styleReport, err := reportInExcel.NewStyle(`
+		{
+			"alignment":{"horizontal":"center"}, 
+			"font":{"bold":true, "color":"#fffff"}, 
+			"fill":{"type":"pattern", "color":["#00ADEF"], "pattern":1}, 
+			"border":[
+				{"type":"left", "color":"#000000", "style":1},
+				{"type":"right", "color":"#000000", "style":1},
+				{"type":"top", "color":"#000000", "style":1},
+				{"type":"bottom", "color":"#000000", "style":1}]
+		}`)
+	if err != nil {
+		fmt.Println("Error applying styles: " + err.Error())
+	}
+	// applying styles
+	reportInExcel.SetCellStyle(sheetName, indexColumns[0]+strconv.Itoa(1), indexColumns[len(indexColumns)-1]+strconv.Itoa(1), styleReport)
+	// inserting data
+	for i := 0; i < len(contentData.DataExcel); i++ {
+		var dataPatientExcel dataPatientHC
+		err := json.Unmarshal([]byte(contentData.DataExcel[i]), &dataPatientExcel)
+		if err != nil {
+			return "", err
+		}
+		for j := 0; j < len(contentHeaders); j++ {
+			var contentString string
+			switch j {
+			case 0:
+				contentString = strconv.Itoa(dataPatientExcel.IdPatient)
+			case 1:
+				contentString = dataPatientExcel.TypeId
+			case 2:
+				contentString = dataPatientExcel.DateClinicHistory
+			case 3:
+				contentString = dataPatientExcel.ActualDateRegistry
+			case 4:
+				contentString = dataPatientExcel.PatientNames
+			case 5:
+				contentString = dataPatientExcel.PatientLastnames
+			default:
+				contentString = dataPatientExcel.HasError
+			}
+			reportInExcel.SetCellValue(sheetName, indexColumns[j]+strconv.Itoa(i+2), contentString)
+		}
+	}
+
+	err = reportInExcel.SaveAs("../public/reports/Reporte.xlsx")
+	if err != nil {
+		return "", nil
+	}
+	return reportInExcel.Path, err
+}
 func main() {
 	publicElementsApp := http.FileServer(http.Dir("../public"))
 	http.Handle("/public/", http.StripPrefix("/public/", publicElementsApp))
@@ -222,6 +314,7 @@ func main() {
 	http.HandleFunc("/record-patient", setPatientRecord)
 	http.HandleFunc("/get-data-patient", patientHosvital)
 	http.HandleFunc("/get-information-from-patient", getReport)
+	http.HandleFunc("/get-report-in-excel", reportInExcel)
 	http.HandleFunc("/Yuls", app)
 	http.ListenAndServe(":8005", nil)
 }
