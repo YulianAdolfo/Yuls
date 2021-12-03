@@ -374,6 +374,7 @@ function convertNameTo(string) {
 }
 function tableInfo(contentQuery) {
     if (contentQuery != null) {
+        var buttonDownload = document.getElementById("download-report")
         var table = document.getElementById("table-info-view-patient")
         var closeInfo = document.getElementById("close-modal-info")
         for (var i = 0; i < contentQuery.length; i++) {
@@ -412,6 +413,22 @@ function tableInfo(contentQuery) {
         closeInfo.onclick = () => {
             closeInfoModal()
         }
+        buttonDownload.onclick = async () => {
+            var dataExcel = {
+                DataExcel: contentQuery
+            }
+            var downlaodReport = await new Promise((resolved, rejected)=>{
+                fetch("/get-report-in-excel", {
+                    method:"post",
+                    body: JSON.stringify(dataExcel),
+                })
+                .then(data => data.json())
+                .then(data => resolved(data))
+                .catch(error => rejected(error))
+            })
+            location.href = downlaodReport.Link
+        }
+
     }else {
         stateProcessAlert("fa-address-book", "No se han encontrado registros", "rgb(243, 98, 1)")   
     }
@@ -426,5 +443,4 @@ function closeInfoModal() {
 function showInfoModal() {
     document.getElementById("information-view-patient").style.display = "block"
 }
-
 
