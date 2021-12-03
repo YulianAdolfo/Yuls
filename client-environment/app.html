@@ -36,15 +36,15 @@
             </select>
             <input type="text" placeholder="Nombres del paciente" id="patient-names">
             <input type="text" placeholder="Apellidos del paciente" id="patient-lastnames">
-            <span>Fecha de registro</span><input type="date" name="date-reg" id="date-reg">
+            <span>Fecha de historia clínica</span><input type="date" name="date-reg" id="date-reg">
             <input type="checkbox" name="error-check" id="error-check">
             <label for="error-check">El paciente presenta errores</label>
             <input type="button" value="Registrar" id="button-submit">
         </form>
     </div>  
-    <div class="information-view-patient" id="information-view-patient">
+    <div class="information-view-patient" id="information-view-patient" style="display: block;">
         <div class="container-info-view-patient">
-            <header>Reporte de pacientes <i class="fas fa-times" id="close-modal-info"></i></header>
+            <header>Reporte de pacientes <i class="fas fa-file-download" id="download-report" title="Descargar reporte"></i> <i class="fas fa-times" id="close-modal-info" title="Cerrar ventana"></i></header>
             <div class="container-table-view-patient">
                <table id="table-info-view-patient">
                    <tr>
