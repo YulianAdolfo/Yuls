@@ -340,7 +340,7 @@ body {
     background-color: rgba(0, 0, 0, .8);
     left: 0;
     top: 0;
-    display: none;
+    /* display: none; */
 }
 .container-info-view-patient {
     width: 90%;
@@ -361,13 +361,28 @@ body {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     position: relative;
+    padding: 10px;
 }
 .container-info-view-patient header i {
     position: absolute;
     right: 10px;
-    font-size: 20px;
     cursor: pointer;
+    background-color: red;
+    padding: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    top: 5px;
+    border-radius: 2px;
+    font-size: 19px;
 }
+.container-info-view-patient header i:nth-of-type(1) {
+    right: 50px;
+    background-color: rgb(30, 219, 5);
+    padding-left: 11px;
+    padding-right: 11px;
+    border-radius: 2px;
+}
+
 .container-table-view-patient {
     width: 98%;
     height: 92%;
