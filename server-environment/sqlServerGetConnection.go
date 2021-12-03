@@ -14,7 +14,7 @@ const (
 	portSql      = 1443
 	userSql      = "consentimientos"
 	passwordSql  = "patientClinicH.21*"
-	databaseName = "PRUEBA-5"
+	databaseName = "HOSVITAL"
 )
 
 func sqlServerGetConnection() *sql.DB {
