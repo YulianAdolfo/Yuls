@@ -124,7 +124,6 @@ generateReportButton.onclick = () => {
         return spanCheckbox
     }
 }
-generateReportButton.click()
 function deleteActualWin(app, div) {
     app.removeChild(div)
     app.style.height = "450px"
@@ -357,6 +356,7 @@ function onprogressRequest() {
 }
 function removeLastElement() {
     app.removeChild(app.lastElementChild)
+    iconHeader("block")
 }
 function iconHeader(state) {
     var icon = app.getElementsByTagName('header')
@@ -426,6 +426,5 @@ function closeInfoModal() {
 function showInfoModal() {
     document.getElementById("information-view-patient").style.display = "block"
 }
-closeInfoModal()
 
 
