@@ -14,6 +14,7 @@
             <header><i class="fas fa-arrow-left" id="close-menu" style="font-size: 25px;margin-left: 20px;"></i><h1><i class="fas fa-users-cog"></i>Menú</h1></header>
             <ul>
                 <li id="report-info"><i class="fas fa-file"></i>Generar reporte</li>
+                <li id="report-info-2"><i class="fas fa-users"></i>Generar consulta por paciente</li>
             </ul>
         </div>
         <header><i class="fas fa-bars" id="open-menu"></i><h1>Panel de registro</h1></header>
@@ -41,6 +42,20 @@
             <label for="error-check">El paciente presenta errores</label>
             <input type="button" value="Registrar" id="button-submit">
         </form>
+        <!-- search information about patient-->
+        <div class="search-by-patient box-generate-info" id="search-by-patient">
+            <header><i class="fas fa-arrow-left" id="return-arrow"></i>Busqueda por paciente</header>
+            <div class="container-create-query">
+                <span>Buscar paciente por</span>
+                <select name="type-search" id="type-search">
+                    <option value="0">N° de documento</option>
+                    <option value="1">Nombres</option>
+                    <option value="2">Apellidos</option>
+                </select>
+                <input type="text" name="query-box" id="query-box" placeholder="Valor(es) a buscar">
+            </div>
+            <button id="button-query">Generar búsqueda</button>
+        </div>
     </div>  
     <div class="information-view-patient" id="information-view-patient">
         <div class="container-info-view-patient">
