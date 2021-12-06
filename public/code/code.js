@@ -10,13 +10,14 @@ var typeIdPatient = document.getElementById("type-id")
 var buttonSubmit = document.getElementById("button-submit")
 var app = document.getElementById("app-container")
 var generateReportButton = document.getElementById("report-info")
+var generateReportButtonByUser = document.getElementById("report-info-2")
+var Mainform = document.getElementById("form-registry")
 
 function getOnlyDiv() {
     var div = document.createElement("div")
     var header = document.createElement("header")
     div.style.width = "100%"
     div.style.height = "100%"
-    div.style.backgroundColor = "white"
     div.style.position = "absolute"
     div.style.left = "0"
     div.style.top = "0"
@@ -24,6 +25,7 @@ function getOnlyDiv() {
     div.appendChild(header)
     app.appendChild(div)
     buttonCloseMenu.click()
+    Mainform.style.display = "none"
     return div
 }
 function getButtons() {
@@ -68,7 +70,7 @@ generateReportButton.onclick = () => {
     select.appendChild(item2)
     select.classList.add("select-of-report")
     var button = getButtons()
-    div.children[0].innerHTML = "<i class='fas fa-arrow-left' id='return-arrow'></i>" + "Generación de reporte"
+    div.children[0].innerHTML = "<i class='fas fa-arrow-left' id='return-arrow-1'></i>" + "Generación de reporte"
     div.appendChild(getSpan()).innerHTML = "Fecha inicio"
     div.appendChild(date1)
     div.appendChild(getSpan()).innerHTML = "Fecha fin"
@@ -77,7 +79,7 @@ generateReportButton.onclick = () => {
     div.appendChild(select)
     div.appendChild(checkPatientErrors)
     div.appendChild(button).innerHTML = "Generar reporte"
-    document.getElementById("return-arrow").onclick = () => deleteActualWin(app, div)
+    document.getElementById("return-arrow-1").onclick = () => {deleteActualWin(app, div), Mainform.style.display = "block"}
     app.style.height = "380px"
 
     button.onclick = async () => {
@@ -417,30 +419,95 @@ function tableInfo(contentQuery) {
             var dataExcel = {
                 DataExcel: contentQuery
             }
-            var downlaodReport = await new Promise((resolved, rejected)=>{
+            var downlaodReport = await new Promise((resolved, rejected) => {
                 fetch("/get-report-in-excel", {
-                    method:"post",
+                    method: "post",
                     body: JSON.stringify(dataExcel),
                 })
-                .then(data => data.json())
-                .then(data => resolved(data))
-                .catch(error => rejected(error))
+                    .then(data => data.json())
+                    .then(data => resolved(data))
+                    .catch(error => rejected(error))
             })
             location.href = downlaodReport.Link
         }
 
-    }else {
-        stateProcessAlert("fa-address-book", "No se han encontrado registros", "rgb(243, 98, 1)")   
+    } else {
+        stateProcessAlert("fa-address-book", "No se han encontrado registros", "rgb(243, 98, 1)")
     }
 }
 function closeInfoModal() {
     document.getElementById("information-view-patient").style.display = "none"
     var tbody = document.getElementById("table-info-view-patient")
-    while(tbody.children.length > 1) {
+    while (tbody.children.length > 1) {
         tbody.removeChild(tbody.lastElementChild)
     }
 }
 function showInfoModal() {
     document.getElementById("information-view-patient").style.display = "block"
 }
+function searchingByPatient() {
+    var containerSearchByPatient = document.getElementById("search-by-patient")
+    var buttonClose = document.getElementById("return-arrow")
+    buttonClose.onclick = () => {
+        containerSearchByPatient.style.display = "none"
+        Mainform.style.display = "block"
+    }
+    var boxQuery = document.getElementById("query-box")
+    var searchBy = document.getElementById("type-search")
+    var buttonSearch = document.getElementById("button-query")
 
+    buttonSearch.onclick = async () => {
+        var queryString = boxQuery.value
+        if (queryString != "" && queryString.length >= 5) {
+            var searchIn = searchBy.value
+            queryString = queryString.trim()
+            queryString = queryString.replaceAll(",", " ")
+            queryString = queryString.split(" ")
+            console.log(queryString)
+            console.log("value of: " + searchIn)
+            for (var i = 0; i < queryString.length; i++) {
+                if (queryString[i] == "" || queryString[i] == " ") {
+                    queryString.splice(i, 1)
+                    i--
+                } else {
+                    if (searchIn == "0") {
+                        var verifyNumber = parseInt(queryString[i])
+                        if (!isNaN(verifyNumber)) {
+                            queryString[i] = verifyNumber
+                        } else {
+                            queryString.splice(i, 1)
+                            i--
+                        }
+                    }
+                }
+            }
+            queryString = queryString.join("|")
+            if (searchIn != "0") {
+                queryString = "'" + queryString+ "'"
+            }
+            if (queryString !="") {
+                            
+            var query = "?query-string=" + queryString + "&query-field="+searchIn
+            onprogressRequest()
+            var state = await new Promise((resolved, rejected) => {
+                fetch("/get-information-by-patient" + query, {
+                    method: "get"
+                })
+                    .then(data => data.json())
+                    .then(data => resolved(data))
+                    .catch(error => {rejected(error), removeLastElement(), stateProcessAlert("fa-question-circle", error + ". Unknown error or sintax.", "red")})
+            })
+            tableInfo(state)
+            removeLastElement()
+            }
+        }else {
+            stateProcessAlert("fa-info-circle", "Faltan campos por llenar, por favor verifique", "orange")
+        }
+    }
+}
+generateReportButtonByUser.onclick = () => {
+    searchingByPatient()
+    document.getElementById("search-by-patient").style.display = "block"
+    Mainform.style.display = "none"
+    buttonCloseMenu.click()
+}
