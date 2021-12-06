@@ -174,12 +174,13 @@ func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) stri
 	fmt.Println(string(toJsonData))
 	return string(toJsonData)
 }
-func selectingDataToBuildReport(dateStart, dateEnd, typeDateReport, showOnlyErrors string) ([]string, error) {
+func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 	connection := getConnectionDB()
-	query, err := connection.Query("CALL GET_REPORT(?, ?, ?, ?)", typeDateReport, dateStart, dateEnd, showOnlyErrors)
+	query, err := connection.Query(completeQuery)
 	if err != nil {
 		fmt.Println("Error: " + err.Error())
 	}
+	fmt.Println(completeQuery + " completa query")
 	var informationForReport []string
 	for query.Next() {
 		var dataReport dataPatientHC
@@ -211,16 +212,36 @@ func getReport(w http.ResponseWriter, r *http.Request) {
 		checkPatientErrors := r.URL.Query().Get("check-only-p-errors")
 		generateReportBy := r.URL.Query().Get("gen-by")
 
-		dataRequest, err := selectingDataToBuildReport(dateStart, dateEnd, generateReportBy, checkPatientErrors)
+		query := fmt.Sprintf("CALL GET_REPORT(%s, %s, %s, %s)", generateReportBy, "'"+dateStart+"'", "'"+dateEnd+"'", checkPatientErrors)
+		fmt.Println(query)
+		dataRequest, err := selectingDataToBuildReport(query)
 		if err != nil {
 			fmt.Println("Error: " + err.Error())
 		}
-		toJson, err := json.Marshal(dataRequest)
-		if err != nil {
-			fmt.Println("Error marshalling: " + err.Error())
-		}
-		fmt.Fprint(w, string(toJson))
+		fmt.Fprint(w, convertDataInJson(dataRequest))
 	}
+}
+func getReportByPatient(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		argumentsQuery := r.URL.Query().Get("query-string")
+		argumentsField := r.URL.Query().Get("query-field")
+
+		query := fmt.Sprintf("CALL INFO_BY_PATIENT(%s, %s)", argumentsQuery, argumentsField)
+		dataRequest, err := selectingDataToBuildReport(query)
+		if err != nil {
+			fmt.Println("Error la puta madre xd : " + err.Error())
+			fmt.Println("Hubo un erroroooooooooooooooooooooooooooooooooooooooo")
+		}
+		fmt.Fprint(w, convertDataInJson(dataRequest))
+	}
+}
+func convertDataInJson(dataRequest []string) string {
+	fmt.Println(dataRequest)
+	toJson, err := json.Marshal(dataRequest)
+	if err != nil {
+		fmt.Println("Error marshalling: " + err.Error())
+	}
+	return string(toJson)
 }
 func reportInExcel(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
@@ -314,6 +335,7 @@ func main() {
 	http.HandleFunc("/record-patient", setPatientRecord)
 	http.HandleFunc("/get-data-patient", patientHosvital)
 	http.HandleFunc("/get-information-from-patient", getReport)
+	http.HandleFunc("/get-information-by-patient", getReportByPatient)
 	http.HandleFunc("/get-report-in-excel", reportInExcel)
 	http.HandleFunc("/Yuls", app)
 	http.ListenAndServe(":8005", nil)
