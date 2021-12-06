@@ -6,11 +6,12 @@ body {
     margin: 0 ;
     padding: 0;
     overflow: hidden;
+    background-image: url('../Images/Wallpaper-app.jpg');
 }
 .app-container {
     width: 800px;
     height: 450px;
-    background-color:white;
+    background-color:rgba(0, 0, 0, .5);
     position: absolute;
     left: 50%;
     top: 50%;
@@ -113,6 +114,9 @@ body {
     margin-right: 10px;
     font-size: 17px;
     float: left;
+}
+.app-container span, label {
+    color: white;
 }
 .app-container form input[type="checkbox"] {
     width: 20px;
@@ -408,4 +412,46 @@ body {
 }
 .container-table-view-patient th {
     background-color: rgb(30, 219, 5);
+}
+/* search patient by patient*/
+.search-by-patient {
+    width: 100%;
+    height: 100%;
+    position:absolute;
+    left:0;
+    top:0;
+    z-index: 1;
+    display: none;
+}
+.container-create-query {
+    width: 100%;
+    height: 50px;
+    position: absolute;
+    top: 40%;
+    transform: translateY(-40%);
+
+}
+.search-by-patient button {
+    background-color: rgb(29, 199, 6);
+    padding: 5px;
+}
+.container-create-query select{
+    margin-top: 25px;
+    width: 25%;
+    font-size: 15px;
+}
+.container-create-query select {
+    cursor: pointer;
+    outline: none;
+    border: 1px solid #ddd;
+    text-align: center;
+    height: 25px;
+}
+.container-create-query input {
+    width: 45%;
+    height: 20px;
+    outline: none;
+    border: 1px solid #ddd;
+    font-size: 15px;
+
 }
