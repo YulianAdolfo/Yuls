@@ -61,6 +61,7 @@ generateReportButton.onclick = () => {
     var item2 = getOptions()
 
     var checkPatientErrors = createCheckboxes("patient-errors", "Generar solo pacientes con errores")
+    checkPatientErrors.style.fontSize = "18px"
 
     item1.innerHTML = "Fecha de historia"
     item2.innerHTML = "Fecha de registro"
@@ -70,6 +71,7 @@ generateReportButton.onclick = () => {
     select.appendChild(item2)
     select.classList.add("select-of-report")
     var button = getButtons()
+    button.style.fontWeight = "600"
     div.children[0].innerHTML = "<i class='fas fa-arrow-left' id='return-arrow-1'></i>" + "Generación de reporte"
     div.appendChild(getSpan()).innerHTML = "Fecha inicio"
     div.appendChild(date1)
@@ -162,9 +164,6 @@ IdPatientBox.onchange = async () => {
             stateProcessAlert("fa-address-book", "Sin registros en nuestro sistema interno", "rgb(243, 98, 1)")
         }
     }
-}
-function boxesForm() {
-
 }
 buttonSender()
 function getDiv() {
@@ -447,14 +446,17 @@ function showInfoModal() {
 }
 function searchingByPatient() {
     var containerSearchByPatient = document.getElementById("search-by-patient")
+    var boxQuery = document.getElementById("query-box")
+    var searchBy = document.getElementById("type-search")
+    var buttonSearch = document.getElementById("button-query")
+
     var buttonClose = document.getElementById("return-arrow")
     buttonClose.onclick = () => {
         containerSearchByPatient.style.display = "none"
         Mainform.style.display = "block"
+        boxQuery.value = ""
+
     }
-    var boxQuery = document.getElementById("query-box")
-    var searchBy = document.getElementById("type-search")
-    var buttonSearch = document.getElementById("button-query")
 
     buttonSearch.onclick = async () => {
         var queryString = boxQuery.value
