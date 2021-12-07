@@ -108,7 +108,10 @@ func responseClientSucess() string {
 func patientHosvital(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		idPatient := r.URL.Query().Get("id-patient")
-		data := getInfoPatientFromHosvitalTest(idPatient, sqlServerGetConnection())
+		data, err := getInfoPatientFromHosvitalTest(idPatient, sqlServerGetConnection())
+		if err != nil {
+			fmt.Fprint(w, responseClientError(err))
+		}
 		fmt.Fprint(w, data)
 	}
 }
@@ -116,13 +119,15 @@ func app(w http.ResponseWriter, r *http.Request) {
 	appTemplate := template.Must(template.ParseFiles("../client-environment/app.html"))
 	appTemplate.Execute(w, nil)
 }
-func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) string {
+func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) (string, error) {
 	fmt.Println(id)
 	contextConnection := context.Background()
 	// check if the connection is alive
 	err := connectionSqlServer.PingContext(contextConnection)
 	if err != nil {
-		fmt.Println("Error in ping connection to sqlserver: " + err.Error())
+		fmt.Println("Error in ping connection to Hosvital " + err.Error())
+		return "", err
+
 	}
 	// if the connection is alive so create the sql qery
 
@@ -150,7 +155,8 @@ func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) stri
 		"FROM CAPBAS WHERE MPCedu =" + "'" + id + "'")
 	rows, err := connectionSqlServer.QueryContext(contextConnection, sqlGetInfo)
 	if err != nil {
-		fmt.Println("Error executing the context to sql server: " + err.Error())
+		fmt.Println("Error connection to Hosvital: " + err.Error())
+		return "", err
 	}
 	defer rows.Close()
 
@@ -171,7 +177,7 @@ func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) stri
 	if err != nil {
 		fmt.Println("Error marshalling the json: " + err.Error())
 	}
-	return string(toJsonData)
+	return string(toJsonData), nil
 }
 func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 	connection := getConnectionDB()
