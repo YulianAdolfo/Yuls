@@ -266,7 +266,7 @@ function buttonSender() {
                 } else if (stateRecord.includes("dial tcp: i/o timeout")) {
                     stateProcessAlert("fa-user-times", "Lo sentimos, inténtelo nuevamente (dial/tcp)", "red")
                 } else {
-                    if (stateRecord == "successfull") {
+                    if (stateRecord == "successful") {
                         stateProcessAlert("fa-user-check", "Registro éxitoso", "limegreen")
                     }
                 }
@@ -274,6 +274,7 @@ function buttonSender() {
                 boxNames.value = ""
                 boxLastnames.value = ""
                 checkboxError.value = ""
+                checkboxError.checked = false
                 buttonSender()
                 removeLastElement()
             }
@@ -415,6 +416,8 @@ function tableInfo(contentQuery) {
             closeInfoModal()
         }
         buttonDownload.onclick = async () => {
+            buttonDownload.disabled = true
+            buttonDownload.style.backgroundColor = "#ddd"
             var dataExcel = {
                 DataExcel: contentQuery
             }
@@ -428,6 +431,8 @@ function tableInfo(contentQuery) {
                     .catch(error => rejected(error))
             })
             location.href = downlaodReport.Link
+            buttonDownload.style.backgroundColor = "rgb(30, 219, 5)"
+            buttonDownload.disabled = false
         }
 
     } else {
@@ -455,7 +460,6 @@ function searchingByPatient() {
         containerSearchByPatient.style.display = "none"
         Mainform.style.display = "block"
         boxQuery.value = ""
-
     }
 
     buttonSearch.onclick = async () => {
@@ -465,8 +469,6 @@ function searchingByPatient() {
             queryString = queryString.trim()
             queryString = queryString.replaceAll(",", " ")
             queryString = queryString.split(" ")
-            console.log(queryString)
-            console.log("value of: " + searchIn)
             for (var i = 0; i < queryString.length; i++) {
                 if (queryString[i] == "" || queryString[i] == " ") {
                     queryString.splice(i, 1)
@@ -497,7 +499,11 @@ function searchingByPatient() {
                 })
                     .then(data => data.json())
                     .then(data => resolved(data))
-                    .catch(error => {rejected(error), removeLastElement(), stateProcessAlert("fa-question-circle", error + ". Unknown error or sintax.", "red")})
+                    .catch(error => {
+                        rejected(error)
+                        removeLastElement()
+                        boxQuery.value = "" 
+                        stateProcessAlert("fa-question-circle", error + ". Unknown error or sintax.", "red")})
             })
             tableInfo(state)
             removeLastElement()
