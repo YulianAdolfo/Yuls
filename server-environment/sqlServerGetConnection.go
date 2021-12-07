@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 
 	_ "github.com/denisenkom/go-mssqldb"
 )
@@ -30,7 +29,7 @@ func sqlServerGetConnection() *sql.DB {
 	// Important for handling network issues and long queries.
 	err = databaseConnection.PingContext(ctx)
 	if err != nil {
-		log.Fatal("Error pinging database: " + err.Error())
+		fmt.Println("Error pinging database: " + err.Error())
 	}
 	return databaseConnection
 }
