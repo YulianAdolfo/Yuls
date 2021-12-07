@@ -18,6 +18,11 @@
             <ul>
                 <li id="report-info"><i class="fas fa-file"></i>Generar reporte</li>
                 <li id="report-info-2"><i class="fas fa-users"></i>Generar consulta por paciente</li>
+                <li id="config"><i class="fas fa-cogs"></i>Configuración</li>
+                <ul id="config-submenu">
+                    <li><input type="checkbox" name="work-with-not-connection" id="work-with-not-connection"><label for="work-with-not-connection">Trabajar sin conexión a Hosvital</label></li>
+                </ul>
+
             </ul>
         </div>
         <header><i class="fas fa-bars" id="open-menu"></i><h1>Panel de registro</h1></header>
@@ -45,6 +50,7 @@
             <label for="error-check">El paciente presenta errores</label>
             <input type="button" value="Registrar" id="button-submit">
         </form>
+        <span id="state-connection-hosvital"></span>
         <!-- search information about patient-->
         <div class="search-by-patient box-generate-info" id="search-by-patient">
             <header><i class="fas fa-arrow-left" id="return-arrow"></i>Busqueda por paciente</header>
