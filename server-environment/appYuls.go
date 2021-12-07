@@ -97,7 +97,7 @@ func responseClientError(err error) string {
 }
 func responseClientSucess() string {
 	m := returnMessage{
-		ContenMessage: "successfull",
+		ContenMessage: "successful",
 	}
 	contentJson, err := json.Marshal(m)
 	if err != nil {
@@ -171,7 +171,6 @@ func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) stri
 	if err != nil {
 		fmt.Println("Error marshalling the json: " + err.Error())
 	}
-	fmt.Println(string(toJsonData))
 	return string(toJsonData)
 }
 func selectingDataToBuildReport(completeQuery string) ([]string, error) {
@@ -229,8 +228,7 @@ func getReportByPatient(w http.ResponseWriter, r *http.Request) {
 		query := fmt.Sprintf("CALL INFO_BY_PATIENT(%s, %s)", argumentsQuery, argumentsField)
 		dataRequest, err := selectingDataToBuildReport(query)
 		if err != nil {
-			fmt.Println("Error la puta madre xd : " + err.Error())
-			fmt.Println("Hubo un erroroooooooooooooooooooooooooooooooooooooooo")
+			fmt.Println(err.Error())
 		}
 		fmt.Fprint(w, convertDataInJson(dataRequest))
 	}
