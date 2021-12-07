@@ -402,7 +402,7 @@ body {
 
 .container-table-view-patient {
     width: 98%;
-    height: 92%;
+    height: 85vh;
     margin: 0 auto;
     margin-top: 10px;
     border-radius: 10px;
