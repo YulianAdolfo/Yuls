@@ -12,7 +12,31 @@ var app = document.getElementById("app-container")
 var generateReportButton = document.getElementById("report-info")
 var generateReportButtonByUser = document.getElementById("report-info-2")
 var Mainform = document.getElementById("form-registry")
+var checkboxNotConnectionHosvital = document.getElementById("work-with-not-connection")
 
+
+function initApp() {
+    if(localStorage.getItem("STATE-DB-HOSVITAL") == "offline") {
+        workingWithoutConnectionToHosvital("Estás trabajando sin conexión a Hosvital")
+        checkboxNotConnectionHosvital.checked = true
+    }
+}
+
+
+checkboxNotConnectionHosvital.onclick = () => {
+    if(checkboxNotConnectionHosvital.checked) {
+        console.log(checkboxNotConnectionHosvital.checked)
+        workingWithoutConnectionToHosvital("Estás trabajando sin conexión a Hosvital")
+        localStorage.setItem("STATE-DB-HOSVITAL", "offline")
+    }else { 
+        console.log(checkboxNotConnectionHosvital.checked)
+        workingWithoutConnectionToHosvital("")
+        localStorage.setItem("STATE-DB-HOSVITAL", "online")
+    }
+}
+function workingWithoutConnectionToHosvital(stateText) {
+    document.getElementById("state-connection-hosvital").innerHTML = stateText
+}
 function getOnlyDiv() {
     var div = document.createElement("div")
     var header = document.createElement("header")
@@ -135,33 +159,54 @@ function deleteActualWin(app, div) {
 //const IP_SERVER = "http://192.168.11.105:8005/"
 IdPatientBox.onchange = async () => {
     var id = parseInt(IdPatientBox.value)
-    if (!isNaN(id)) {
-        var stateMessage = " | consultando..."
-        IdPatientBox.disabled = true
-        IdPatientBox.style.backgroundColor = "rgba(1, 172, 240)"
-        IdPatientBox.style.color = "white"
-        IdPatientBox.value = IdPatientBox.value + stateMessage
-        var getInfoPatient = await new Promise((resolved, rejected) => {
-            fetch("/get-data-patient?id-patient=" + id, {
-                method: "get"
+    if (localStorage.getItem("STATE-DB-HOSVITAL") === "online") {
+        if (!isNaN(id)) {
+            var stateMessage = " | consultando..."
+            IdPatientBox.disabled = true
+            IdPatientBox.style.backgroundColor = "rgba(1, 172, 240)"
+            IdPatientBox.style.color = "white"
+            IdPatientBox.value = IdPatientBox.value + stateMessage
+            var getInfoPatient = await new Promise((resolved, rejected) => {
+                fetch("/get-data-patient?id-patient=" + id, {
+                    method: "get"
+                })
+                    .then(resp => resp.json())
+                    .then(data => resolved(data))
+                    .then(error => {
+                        rejected(error)
+                    })
             })
-                .then(resp => resp.json())
-                .then(data => resolved(data))
-                .then(error => rejected(error))
-        })
-        stateMessage = ""
-        IdPatientBox.disabled = false
-        IdPatientBox.style.backgroundColor = "white"
-        IdPatientBox.style.color = "black"
-        IdPatientBox.value = id
-        if (getInfoPatient.Names != "" && getInfoPatient.Lastnames != "") {
-            boxNames.value = getInfoPatient.Names
-            boxLastnames.value = getInfoPatient.Lastnames
-            typeIdPatient.value = getInfoPatient.TypId
-        } else {
-            boxNames.value = ""
-            boxLastnames.value = ""
-            stateProcessAlert("fa-address-book", "Sin registros en nuestro sistema interno", "rgb(243, 98, 1)")
+    
+            stateMessage = ""
+            IdPatientBox.disabled = false
+            IdPatientBox.style.backgroundColor = "white"
+            IdPatientBox.style.color = "black"
+            IdPatientBox.value = id
+            if (getInfoPatient.Names != "" && getInfoPatient.Lastnames != "") {
+                if(getInfoPatient.ContenMessage) {
+                    stateProcessAlert("fa-user-times", "Error Fatal de Conexión", "red")
+                    alert("Error fatal con conexión a Hosvital.\n"+
+                            getInfoPatient.ContenMessage+"\n"+
+                            "Lo más probable es que no haya una conexión con el servidor o que se haya perdido.\n"+
+                            "Para verificar este error vaya a su línea de comandos y realice un ping de conexión al servidor de base de datos.\n"+
+                            "Comuníquese con el área de sistemas para recibir soporte.")
+    
+                    alert("Si lo desea puede trabajar sin conexión a Hosvital, lo que indica que:\n"+
+                            "Tendrá que usted mismo (manualmente) ingresar el nombre y el apellido del paciente\n"+
+                            "Para activar esta función realice lo siguiente:\n"+
+                            "1- Vaya al menú\n" +
+                            "2- Click en configuración\n"+
+                            "3- Habilite la función de: Trabajar sin conexión a Hosvital")
+                }else {
+                    boxNames.value = getInfoPatient.Names
+                    boxLastnames.value = getInfoPatient.Lastnames
+                    typeIdPatient.value = getInfoPatient.TypId
+                }
+            } else {
+                boxNames.value = ""
+                boxLastnames.value = ""
+                stateProcessAlert("fa-address-book", "Sin registros en nuestro sistema interno", "rgb(243, 98, 1)")
+            }
         }
     }
 }
@@ -519,3 +564,4 @@ generateReportButtonByUser.onclick = () => {
     Mainform.style.display = "none"
     buttonCloseMenu.click()
 }
+initApp()
