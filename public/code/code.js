@@ -35,11 +35,9 @@ configConnection.onclick = () => {
 }
 checkboxNotConnectionHosvital.onclick = () => {
     if(checkboxNotConnectionHosvital.checked) {
-        console.log(checkboxNotConnectionHosvital.checked)
         workingWithoutConnectionToHosvital("Estás trabajando sin conexión a Hosvital")
         localStorage.setItem("STATE-DB-HOSVITAL", "offline")
     }else { 
-        console.log(checkboxNotConnectionHosvital.checked)
         workingWithoutConnectionToHosvital("")
         localStorage.setItem("STATE-DB-HOSVITAL", "online")
     }
@@ -220,7 +218,6 @@ IdPatientBox.onchange = async () => {
         }
     }
 }
-buttonSender()
 function getDiv() {
     var div = document.createElement("div")
     var i = document.createElement("i")
@@ -231,6 +228,7 @@ function getDiv() {
 function getAlertDiv() {
     return document.createElement("div")
 }
+buttonSender()
 function buttonSender() {
     buttonSubmit.onclick = () => {
         // getting values from boxes in form
@@ -419,16 +417,6 @@ function removeLastElement() {
 function iconHeader(state) {
     var icon = app.getElementsByTagName('header')
     icon[1].children[0].style.display = state
-}
-function convertNameTo(string) {
-    if (string != "") {
-        var str1 = string[0]
-        var str2 = str1 + string.substring(1, string.length).toLowerCase()
-        string = str2
-        return string
-    } else {
-        return ""
-    }
 }
 function tableInfo(contentQuery) {
     if (contentQuery != null && (contentQuery.length-1) > 0) {
