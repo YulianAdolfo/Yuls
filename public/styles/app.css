@@ -184,6 +184,7 @@ body {
 }
 #config-submenu {
     margin: 0;
+    display: none;
 }
 #config-submenu label {
     cursor: pointer;
