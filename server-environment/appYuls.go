@@ -61,8 +61,6 @@ func newClinicHistory(dataPatienStruct dataPatientHC) error {
 		return err
 	}
 	defer connection.Close()
-	fmt.Println("success")
-
 	return err
 }
 func setPatientRecord(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +79,6 @@ func setPatientRecord(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, responseClientError(err))
 			return
 		}
-		fmt.Println(responseClientSucess())
 		fmt.Fprint(w, responseClientSucess())
 	}
 }
@@ -120,7 +117,6 @@ func app(w http.ResponseWriter, r *http.Request) {
 	appTemplate.Execute(w, nil)
 }
 func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) (string, error) {
-	fmt.Println(id)
 	contextConnection := context.Background()
 	// check if the connection is alive
 	err := connectionSqlServer.PingContext(contextConnection)
@@ -190,7 +186,7 @@ func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 		var dataReport dataPatientHC
 		err = query.Scan(&dataReport.IdPatient, &dataReport.TypeId, &dataReport.DateClinicHistory, &dataReport.ActualDateRegistry, &dataReport.PatientNames, &dataReport.PatientLastnames, &dataReport.HasError)
 		if err != nil {
-			fmt.Println("Error scannig : " + err.Error())
+			fmt.Println("Error scanning : " + err.Error())
 		}
 		content, err := json.Marshal(dataPatientHC{
 			IdPatient:          dataReport.IdPatient,
@@ -234,7 +230,6 @@ func getReport(w http.ResponseWriter, r *http.Request) {
 		generateReportBy := r.URL.Query().Get("gen-by")
 
 		query := fmt.Sprintf("CALL GET_REPORT(%s, %s, %s, %s)", generateReportBy, "'"+dateStart+"'", "'"+dateEnd+"'", checkPatientErrors)
-		fmt.Println(query)
 		dataRequest, err := selectingDataToBuildReport(query)
 		if err != nil {
 			fmt.Println("Error: " + err.Error())
@@ -256,7 +251,6 @@ func getReportByPatient(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func convertDataInJson(dataRequest []string) string {
-	fmt.Println(dataRequest)
 	toJson, err := json.Marshal(dataRequest)
 	if err != nil {
 		fmt.Println("Error marshalling: " + err.Error())
