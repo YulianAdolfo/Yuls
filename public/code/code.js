@@ -12,6 +12,7 @@ var app = document.getElementById("app-container")
 var generateReportButton = document.getElementById("report-info")
 var generateReportButtonByUser = document.getElementById("report-info-2")
 var Mainform = document.getElementById("form-registry")
+var configConnection = document.getElementById("config")
 var checkboxNotConnectionHosvital = document.getElementById("work-with-not-connection")
 
 
@@ -19,10 +20,19 @@ function initApp() {
     if(localStorage.getItem("STATE-DB-HOSVITAL") == "offline") {
         workingWithoutConnectionToHosvital("Estás trabajando sin conexión a Hosvital")
         checkboxNotConnectionHosvital.checked = true
+    }else {
+        localStorage.setItem("STATE-DB-HOSVITAL", "online")
     }
 }
 
-
+configConnection.onclick = () => {
+    var connectionButton = document.getElementById("config-submenu")
+    if (connectionButton.style.display == "" || connectionButton.style.display == "none") {
+        connectionButton.style.display = "block"
+    }else {
+        connectionButton.style.display = "none"
+    }
+}
 checkboxNotConnectionHosvital.onclick = () => {
     if(checkboxNotConnectionHosvital.checked) {
         console.log(checkboxNotConnectionHosvital.checked)
@@ -191,7 +201,7 @@ IdPatientBox.onchange = async () => {
                             "Para verificar este error vaya a su línea de comandos y realice un ping de conexión al servidor de base de datos.\n"+
                             "Comuníquese con el área de sistemas para recibir soporte.")
     
-                    alert("Si lo desea puede trabajar sin conexión a Hosvital, lo que indica que:\n"+
+                    alert("Si lo desea (recomendable) puede trabajar sin conexión a Hosvital, lo que indica que:\n"+
                             "Tendrá que usted mismo (manualmente) ingresar el nombre y el apellido del paciente\n"+
                             "Para activar esta función realice lo siguiente:\n"+
                             "1- Vaya al menú\n" +
@@ -364,6 +374,7 @@ function setFailProcessAlert() {
 buttonCloseMenu.onclick = () => {
     menu.classList.remove("show-win-menu")
     menu.classList.add("hide-win-menu")
+    document.getElementById("config-submenu").style.display = "none"
 }
 buttonOpenMenu.onclick = () => {
     menu.classList.add("hide-win-menu")
@@ -420,11 +431,12 @@ function convertNameTo(string) {
     }
 }
 function tableInfo(contentQuery) {
-    if (contentQuery != null) {
+    if (contentQuery != null && (contentQuery.length-1) > 0) {
         var buttonDownload = document.getElementById("download-report")
         var table = document.getElementById("table-info-view-patient")
         var closeInfo = document.getElementById("close-modal-info")
-        for (var i = 0; i < contentQuery.length; i++) {
+        // the last one element id makes reference to the amount of registries in DB
+        for (var i = 0; i < contentQuery.length-1; i++) {
             var tr = document.createElement("tr")
             var data = JSON.parse(contentQuery[i])
             for (var j = 0; j < 7; j++) {
@@ -479,7 +491,8 @@ function tableInfo(contentQuery) {
             buttonDownload.style.backgroundColor = "rgb(30, 219, 5)"
             buttonDownload.disabled = false
         }
-
+        var amountPatients = JSON.parse(contentQuery[contentQuery.length-1])
+        document.getElementById("amount-patients").innerHTML = contentQuery.length-1 + "/"+ amountPatients.IdPatient + " registros obtenidos"
     } else {
         stateProcessAlert("fa-address-book", "No se han encontrado registros", "rgb(243, 98, 1)")
     }
