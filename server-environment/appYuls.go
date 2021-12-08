@@ -185,7 +185,6 @@ func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 	if err != nil {
 		fmt.Println("Error: " + err.Error())
 	}
-	fmt.Println(completeQuery + " completa query")
 	var informationForReport []string
 	for query.Next() {
 		var dataReport dataPatientHC
@@ -207,6 +206,23 @@ func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 		}
 		informationForReport = append(informationForReport, string(content))
 	}
+	// getting the number of registries actually
+	query, err = connection.Query("SELECT COUNT(IdPatient) FROM " + DATABASE_IN_USE)
+	if err != nil {
+		fmt.Println("Error in query getting amount of: " + err.Error())
+	}
+	var amount dataPatientHC
+	for query.Next() {
+		err = query.Scan(&amount.IdPatient)
+		if err != nil {
+			fmt.Println("Error scanning the data in getting amount of: " + err.Error())
+		}
+	}
+	toJsonAmount, err := json.Marshal(amount)
+	if err != nil {
+		fmt.Println("Error marshallig the data: " + err.Error())
+	}
+	informationForReport = append(informationForReport, string(toJsonAmount))
 	defer connection.Close()
 	return informationForReport, nil
 }
