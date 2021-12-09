@@ -113,8 +113,9 @@ func patientHosvital(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func app(w http.ResponseWriter, r *http.Request) {
+	developerName := struct{ DevName string }{DevName: "Diseñado y desarrollado por Yulian Adolfo Rojas"}
 	appTemplate := template.Must(template.ParseFiles("../client-environment/app.html"))
-	appTemplate.Execute(w, nil)
+	appTemplate.Execute(w, developerName)
 }
 func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) (string, error) {
 	contextConnection := context.Background()
