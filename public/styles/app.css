@@ -483,3 +483,77 @@ body {
     font-size: 15px;
 
 }
+/* Hosvital information patient by name */
+.information-panel-hosvital-name {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    background-color: rgba(0, 0, 0, .8);
+    display: none;
+}
+.container-hosvital-name {
+    width: 800px;
+    height: 400px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    background-color: white;
+    border-radius: 5px;
+    overflow-y: scroll;
+}
+.container-hosvital-name::-webkit-scrollbar {
+    width: 10px;
+}
+.container-hosvital-name::-webkit-scrollbar-thumb {
+    background-color: grey;
+}
+.container-hosvital-name header {
+    background-color: #00adef;
+    text-align: center;
+    padding: 3px;
+    color: white;
+    border-top-left-radius: 5px;
+    font-weight: bold;
+    font-size: 21px;
+}
+.container-hosvital-name header i:nth-of-type(1 ) {
+    margin-right: 5px;
+}
+.container-hosvital-name header i:nth-of-type(2) {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+    font-weight: bold;
+    font-size: 20px;
+    cursor: pointer;
+}
+#information-table-hosvital-name {
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    width: 100%;
+}
+#information-table-hosvital-name th, td, tr{
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+}
+#information-table-hosvital-name th {
+    background-color: rgb(29, 199, 6);
+    font-size: 16px;
+    font-weight: normal;
+    position: sticky;
+    top: -1px;
+}
+#information-table-hosvital-name td {
+    font-size: 15px;
+}
+#information-table-hosvital-name tr:hover {
+    background-color: rgb(236, 236, 236);
+}
+#information-table-hosvital-name i {
+    font-size: 26px;
+    color: #00adef;
+    cursor: pointer;
+}
