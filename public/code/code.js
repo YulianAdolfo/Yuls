@@ -167,30 +167,47 @@ function deleteActualWin(app, div) {
 //const IP_SERVER = "http://192.168.11.105:8005/"
 IdPatientBox.onchange = async () => {
     var id = parseInt(IdPatientBox.value)
+    var stringIdQuery = IdPatientBox.value
+    var getInfoPatient = null
     if (localStorage.getItem("STATE-DB-HOSVITAL") === "online") {
-        if (!isNaN(id)) {
+        if (!isNaN(id) || stringIdQuery.substring(0,3) == "-n " && stringIdQuery.substring(3, stringIdQuery.length).length >= 3) {
             var stateMessage = " | consultando..."
             IdPatientBox.disabled = true
             IdPatientBox.style.backgroundColor = "rgba(1, 172, 240)"
             IdPatientBox.style.color = "white"
             IdPatientBox.value = IdPatientBox.value + stateMessage
-            var getInfoPatient = await new Promise((resolved, rejected) => {
-                fetch("/get-data-patient?id-patient=" + id, {
-                    method: "get"
+            if (!isNaN(id)) {
+                getInfoPatient = await new Promise((resolved, rejected) => {
+                    fetch("/get-data-patient?id-patient=" + id, {
+                        method: "get"
+                    })
+                        .then(resp => resp.json())
+                        .then(data => resolved(data))
+                        .then(error => {
+                            rejected(error)
+                        })
                 })
+            }else {
+                var patientNameHosvital = stringIdQuery.substring(3, stringIdQuery.length)
+                getInfoPatient = await new Promise((resolved, rejected) => {
+                    fetch("/data-patient-from-hosvital?username-patient=" + patientNameHosvital, {
+                        method: "get"
+                    })
                     .then(resp => resp.json())
                     .then(data => resolved(data))
-                    .then(error => {
-                        rejected(error)
+                    .catch(error => {
+                        rejected(error),
+                        alert(error)
+
                     })
-            })
+                })            
+            }
     
             stateMessage = ""
             IdPatientBox.disabled = false
             IdPatientBox.style.backgroundColor = "white"
             IdPatientBox.style.color = "black"
-            IdPatientBox.value = id
-            if (getInfoPatient.Names != "" && getInfoPatient.Lastnames != "") {
+            if (!isNaN(id) && getInfoPatient.Names != "" && getInfoPatient.Lastnames != "") {
                 if(getInfoPatient.ContenMessage) {
                     stateProcessAlert("fa-user-times", "Error Fatal de Conexión", "red")
                     alert("Error fatal con conexión a Hosvital.\n"+
@@ -206,13 +223,62 @@ IdPatientBox.onchange = async () => {
                             "2- Click en configuración\n"+
                             "3- Habilite la función de: Trabajar sin conexión a Hosvital")
                 }else {
+                    IdPatientBox.value = id
                     boxNames.value = getInfoPatient.Names
                     boxLastnames.value = getInfoPatient.Lastnames
                     typeIdPatient.value = getInfoPatient.TypId
                 }
             } else {
-                boxNames.value = ""
-                boxLastnames.value = ""
+                if (!isNaN(id)) {
+                    IdPatientBox.value = id
+                    boxNames.value = ""
+                    boxLastnames.value = ""
+                }else {
+                    var containerTableHosvitalByName =  document.getElementById("information-panel-hosvital-name")
+                    var buttonBack = document.getElementById("arrow-back-hvt")
+                    var table = document.getElementById("information-table-hosvital-name")
+                    IdPatientBox.value = stringIdQuery.substring(3, stringIdQuery.length)
+                    if (getInfoPatient != null) {
+                        for(var i = 0; i < getInfoPatient.length; i++) {
+                            var tr = document.createElement("tr")
+                            for(var j =0; j < 3; j++) {
+                                var td = document.createElement("td")
+                                switch(j) {
+                                    case 0:
+                                        td.innerHTML = getInfoPatient[i].MPCedu
+                                        break;
+                                    case 1:
+                                        td.innerHTML = getInfoPatient[i].MPNom1 +" "+getInfoPatient[i].MPApe1
+                                        break;
+                                    default:
+                                        var icon = document.createElement("i")
+                                        icon.classList.add("fas", "fa-pen-square")
+                                        icon.title = "Agregar al formulario"
+                                        td.appendChild(icon)
+                                        icon.onclick = (e) => {
+                                            var indexData =Array.from(table.children).indexOf(e.target.parentElement.parentElement)
+                                            var dataPatientSet = getInfoPatient[indexData-1]
+                                            IdPatientBox.value = dataPatientSet.MPCedu
+                                            boxNames.value = dataPatientSet.MPNom1
+                                            boxLastnames.value = dataPatientSet.MPApe1
+                                            buttonBack.click()
+                                        }
+                                        break;
+                                    }
+                                tr.appendChild(td)
+                            }
+                            table.appendChild(tr)
+                        }
+                        buttonBack.onclick = () => {
+                            while(table.children.length > 1) {
+                                table.removeChild(table.lastElementChild)
+                            }
+                            containerTableHosvitalByName.style.display = "none"
+                        }
+                        containerTableHosvitalByName.style.display = "block"
+                        return
+                    }
+                }
                 stateProcessAlert("fa-address-book", "Sin registros en nuestro sistema interno", "rgb(243, 98, 1)")
             }
         }
