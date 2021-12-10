@@ -29,10 +29,10 @@ type returnMessage struct {
 	ContenMessage string
 }
 type sqlColumnsName struct {
-	MPNom1, MPApe1, MPTDoc string
+	MPNom1, MPApe1, MPTDoc, MPCedu string
 }
 type resultPatientSqlServer struct {
-	Names, Lastnames, TypId string
+	Names, Lastnames, TypId, DocId string
 }
 type setDataExcel struct {
 	DataExcel []string
@@ -176,6 +176,47 @@ func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) (str
 	}
 	return string(toJsonData), nil
 }
+func getPatientsByNameFromHosvital(patientName string, connectionSqlServer *sql.DB) (string, error) {
+	contextConnection := context.Background()
+	// check if the connection is alive
+	err := connectionSqlServer.PingContext(contextConnection)
+	if err != nil {
+		fmt.Println("Error in ping connection to Hosvital " + err.Error())
+		return "", err
+
+	}
+	// if the connection is alive so create the sql qery
+	sqlGetInfo := "SELECT TOP 10\n" +
+		"RTRIM(MPCedu),\n" +
+		"RTRIM(CONCAT(CONCAT(LEFT(MPNom1, 1), LOWER(RIGHT(RTRIM(MPNom1), LEN(MPNom1)-1))),' ',IIF (LEN(RTRIM(MPNom2))=0,'', CONCAT(LEFT(MPNom2, 1), LOWER(RIGHT(RTRIM(MPNom2), LEN(MPNom2)-1)))))),\n+" +
+		"RTRIM(CONCAT(CONCAT(LEFT(MPApe1, 1), LOWER(RIGHT(RTRIM(MPApe1), LEN(MPApe1)-1))),' ',IIF  (LEN(RTRIM(MPApe2))=0,'', CONCAT(LEFT(MPApe2, 1), LOWER(RIGHT(RTRIM(MPApe2), LEN(MPApe2)-1))))))\n" +
+		"FROM CAPBAS WHERE CONCAT(RTRIM(MPNom1),' ',RTRIM(MPNom2), ' ', RTRIM(MPApe1), ' ', RTRIM(MPApe2)) LIKE " + "'" + patientName + "%'"
+	rows, err := connectionSqlServer.QueryContext(contextConnection, sqlGetInfo)
+	if err != nil {
+		fmt.Println("Error connection to Hosvital: " + err.Error())
+		return "", err
+	}
+	defer rows.Close()
+
+	var patientListByName []interface{}
+	for rows.Next() {
+		var dataSqlServer sqlColumnsName
+		err = rows.Scan(&dataSqlServer.MPCedu, &dataSqlServer.MPNom1, &dataSqlServer.MPApe1)
+		if err != nil {
+			fmt.Println("Error scannig data from sql-server: " + err.Error())
+			return "", err
+		}
+		// asigning values to then convert then into json
+		patientListByName = append(patientListByName, dataSqlServer)
+	}
+	defer connectionSqlServer.Close()
+	toJsonData, err := json.Marshal(patientListByName)
+	if err != nil {
+		fmt.Println("Error marshalling the json: " + err.Error())
+		return "", err
+	}
+	return string(toJsonData), nil
+}
 func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 	connection := getConnectionDB()
 	query, err := connection.Query(completeQuery)
@@ -278,6 +319,18 @@ func reportInExcel(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+func patientNameHosvital(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		patientName := r.URL.Query().Get("username-patient")
+		if patientName != "" {
+			requestPatientNames, err := getPatientsByNameFromHosvital(patientName, sqlServerGetConnection())
+			if err != nil {
+				fmt.Fprint(w, responseClientError(err))
+			}
+			fmt.Fprint(w, requestPatientNames)
+		}
+	}
+}
 func createExcelReport(contentData setDataExcel) (string, error) {
 	contentHeaders := []string{"Documento N°", "Tipo ID", "Fecha de historia", "Fecha de registro", "Nombres", "Apellidos", "¿Paciente con error?"}
 	indexColumns := []string{"A", "B", "C", "D", "E", "F", "G"}
@@ -352,6 +405,7 @@ func main() {
 	http.HandleFunc("/get-information-from-patient", getReport)
 	http.HandleFunc("/get-information-by-patient", getReportByPatient)
 	http.HandleFunc("/get-report-in-excel", reportInExcel)
+	http.HandleFunc("/data-patient-from-hosvital", patientNameHosvital)
 	http.HandleFunc("/Yuls", app)
 	http.ListenAndServe(":8005", nil)
 }
