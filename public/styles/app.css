@@ -140,6 +140,9 @@ body {
     display: inline-block;
     font-weight: 500;
 }
+#reason-why-error {
+    width: 57%;
+}
 /*menu styles*/
 .menu-panel {
     width: 100%;
