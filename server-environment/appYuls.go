@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -23,7 +24,7 @@ type dataPatientHC struct {
 	PatientNames       string
 	PatientLastnames   string
 	TypeId             string
-	HasError           string
+	HasError           bool
 	DescError          string
 }
 type returnMessage struct {
@@ -48,7 +49,7 @@ func newClinicHistory(dataPatienStruct dataPatientHC) error {
 	connection := getConnectionDB()
 	knowExistancePatient := thisPatientExists(strconv.Itoa(dataPatienStruct.IdPatient))
 	if knowExistancePatient != 1 {
-		insertQuery := "INSERT INTO ? (actualDateRegistry, dateClinicHistory, IdPatient, patientNames, patientLastnames, typeId, hasError) VALUES (?,?,?,?,?,?,?)"
+		insertQuery := fmt.Sprintf("INSERT INTO %s (actualDateRegistry, dateClinicHistory, IdPatient, patientNames, patientLastnames, typeId, hasError) VALUES (?,?,?,?,?,?,?)", DATABASE_IN_USE)
 		contextQuery, cancelFunction := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancelFunction()
 		statement, err := connection.PrepareContext(contextQuery, insertQuery)
@@ -57,15 +58,46 @@ func newClinicHistory(dataPatienStruct dataPatientHC) error {
 			return err
 		}
 		defer statement.Close()
-		_, err = statement.ExecContext(contextQuery, DATABASE_IN_USE, dataPatienStruct.ActualDateRegistry, dataPatienStruct.DateClinicHistory, dataPatienStruct.IdPatient, dataPatienStruct.PatientNames, dataPatienStruct.PatientLastnames, dataPatienStruct.TypeId, dataPatienStruct.HasError)
-
+		_, err = statement.ExecContext(contextQuery, dataPatienStruct.ActualDateRegistry, dataPatienStruct.DateClinicHistory, dataPatienStruct.IdPatient, dataPatienStruct.PatientNames, dataPatienStruct.PatientLastnames, dataPatienStruct.TypeId, dataPatienStruct.HasError)
 		if err != nil {
 			fmt.Println("Error executing the context " + err.Error())
 			return err
 		}
-		defer connection.Close()
+		// verify if the patient has some errors
+		if dataPatienStruct.HasError {
+			err = insertDigitErrors(dataPatienStruct.IdPatient, dataPatienStruct.DescError, connection)
+			if err != nil {
+				fmt.Println("Error: " + err.Error())
+				return err
+			}
+		}
 	} else {
-		fmt.Println("El pacient existe!")
+		if dataPatienStruct.HasError {
+			err := insertDigitErrors(dataPatienStruct.IdPatient, dataPatienStruct.DescError, connection)
+			if err != nil {
+				fmt.Println("Error: " + err.Error())
+				return err
+			}
+		} else {
+			return errors.New("already registered")
+		}
+	}
+	defer connection.Close()
+	return nil
+}
+func insertDigitErrors(id int, description string, connection *sql.DB) error {
+	query := "INSERT INTO TABLE_ERRORS (ID_PATIENT, DESCRIPTION_ERROR) VALUES (?,?)"
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	statement, err := connection.PrepareContext(ctx, query)
+	if err != nil {
+		fmt.Println("Error: " + err.Error())
+		return err
+	}
+	_, err = statement.ExecContext(ctx, id, description)
+	if err != nil {
+		fmt.Println("Error: " + err.Error())
+		return err
 	}
 	return nil
 }
@@ -405,7 +437,7 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 			case 5:
 				contentString = dataPatientExcel.PatientLastnames
 			default:
-				contentString = dataPatientExcel.HasError
+				contentString = strconv.FormatBool(dataPatientExcel.HasError)
 			}
 			reportInExcel.SetCellValue(sheetName, indexColumns[j]+strconv.Itoa(i+2), contentString)
 		}
