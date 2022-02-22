@@ -142,6 +142,7 @@ body {
 }
 #reason-why-error {
     width: 57%;
+    display: none;
 }
 /*menu styles*/
 .menu-panel {
