@@ -24,6 +24,7 @@ type dataPatientHC struct {
 	PatientLastnames   string
 	TypeId             string
 	HasError           string
+	DescError          string
 }
 type returnMessage struct {
 	ContenMessage string
@@ -44,24 +45,43 @@ const (
 
 // insert new patients
 func newClinicHistory(dataPatienStruct dataPatientHC) error {
-	// connecting to database
 	connection := getConnectionDB()
-	insertQuery := "INSERT INTO " + DATABASE_IN_USE + " (actualDateRegistry, dateClinicHistory, IdPatient, patientNames, patientLastnames, typeId, hasError) VALUES (?,?,?,?,?,?,?)"
-	contextQuery, cancelFunction := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancelFunction()
-	statement, err := connection.PrepareContext(contextQuery, insertQuery)
-	if err != nil {
-		fmt.Println("Error preparing the query with context " + err.Error())
-		return err
+	knowExistancePatient := thisPatientExists(strconv.Itoa(dataPatienStruct.IdPatient))
+	if knowExistancePatient != 1 {
+		insertQuery := "INSERT INTO ? (actualDateRegistry, dateClinicHistory, IdPatient, patientNames, patientLastnames, typeId, hasError) VALUES (?,?,?,?,?,?,?)"
+		contextQuery, cancelFunction := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancelFunction()
+		statement, err := connection.PrepareContext(contextQuery, insertQuery)
+		if err != nil {
+			fmt.Println("Error preparing the query with context " + err.Error())
+			return err
+		}
+		defer statement.Close()
+		_, err = statement.ExecContext(contextQuery, DATABASE_IN_USE, dataPatienStruct.ActualDateRegistry, dataPatienStruct.DateClinicHistory, dataPatienStruct.IdPatient, dataPatienStruct.PatientNames, dataPatienStruct.PatientLastnames, dataPatienStruct.TypeId, dataPatienStruct.HasError)
+
+		if err != nil {
+			fmt.Println("Error executing the context " + err.Error())
+			return err
+		}
+		defer connection.Close()
+	} else {
+		fmt.Println("El pacient existe!")
 	}
-	defer statement.Close()
-	_, err = statement.ExecContext(contextQuery, dataPatienStruct.ActualDateRegistry, dataPatienStruct.DateClinicHistory, dataPatienStruct.IdPatient, dataPatienStruct.PatientNames, dataPatienStruct.PatientLastnames, dataPatienStruct.TypeId, dataPatienStruct.HasError)
+	return nil
+}
+func thisPatientExists(id string) int {
+	connectionToDatabase := getConnectionDB()
+	query := fmt.Sprintf("SELECT EXISTS (SELECT * FROM "+DATABASE_IN_USE+" WHERE IdPatient = '%s') AS patientExist", id)
+	var patientExist string
+	err := connectionToDatabase.QueryRow(query).Scan(&patientExist)
 	if err != nil {
-		fmt.Println("Error executing the context " + err.Error())
-		return err
+		fmt.Println("Error: " + err.Error())
 	}
-	defer connection.Close()
-	return err
+	state, err := strconv.Atoi(patientExist)
+	if err != nil {
+		fmt.Println("Cannot convert to int: " + err.Error())
+	}
+	return state
 }
 func setPatientRecord(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
@@ -72,6 +92,7 @@ func setPatientRecord(w http.ResponseWriter, r *http.Request) {
 		var dataPatientHc dataPatientHC
 		json.Unmarshal(bodyRequest, &dataPatientHc)
 		// getting the actual date
+		fmt.Println(dataPatientHc)
 		dataPatientHc.ActualDateRegistry = time.Now().String()
 		// function to insert new records
 		err = newClinicHistory(dataPatientHc)
@@ -186,7 +207,7 @@ func getPatientsByNameFromHosvital(patientName string, connectionSqlServer *sql.
 
 	}
 	// if the connection is alive so create the sql qery
-	sqlGetInfo := "SELECT TOP 10\n" +
+	sqlGetInfo := "SELECT TOP 50\n" +
 		"RTRIM(MPCedu),\n" +
 		"RTRIM(CONCAT(CONCAT(LEFT(MPNom1, 1), LOWER(RIGHT(RTRIM(MPNom1), LEN(MPNom1)-1))),' ',IIF (LEN(RTRIM(MPNom2))=0,'', CONCAT(LEFT(MPNom2, 1), LOWER(RIGHT(RTRIM(MPNom2), LEN(MPNom2)-1)))))),\n+" +
 		"RTRIM(CONCAT(CONCAT(LEFT(MPApe1, 1), LOWER(RIGHT(RTRIM(MPApe1), LEN(MPApe1)-1))),' ',IIF  (LEN(RTRIM(MPApe2))=0,'', CONCAT(LEFT(MPApe2, 1), LOWER(RIGHT(RTRIM(MPApe2), LEN(MPApe2)-1))))))\n" +
