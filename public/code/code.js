@@ -356,9 +356,11 @@ function buttonSender() {
             if (checkboxError.checked) {
                 patientErrors = true
                 descriptionError = reasonWhyErrorBox.value
+                console.log("tiene errores")
             } else {
                 patientErrors = false
                 descriptionError = ""
+                console.log("no tiene erorres")
             }
             // data in object
             var recordDataPatient = {
@@ -367,7 +369,7 @@ function buttonSender() {
                 patientLastnames: lastnames,
                 dateClinicHistory: dateHc,
                 typeId: typeId,
-                hasError: patientErrors.toString(),
+                hasError: patientErrors,
                 descError: descriptionError
             }
             // converting to json
@@ -391,7 +393,8 @@ function buttonSender() {
                         .catch(error => rejected(error))
                 })
                 stateRecord = stateRecord.ContenMessage
-                if (stateRecord.includes("Error 1062") || stateRecord.includes("Duplicate entry")) {
+                console.log(stateRecord)
+                if (stateRecord == "already registered") {
                     stateProcessAlert("fa-user-times", "Usuario existente, se ha denegado el registro", "red")
                 } else if (stateRecord.includes("dial tcp: i/o timeout")) {
                     stateProcessAlert("fa-user-times", "Lo sentimos, inténtelo nuevamente (dial/tcp)", "red")
