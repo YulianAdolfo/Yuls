@@ -14,6 +14,7 @@ var generateReportButtonByUser = document.getElementById("report-info-2")
 var Mainform = document.getElementById("form-registry")
 var configConnection = document.getElementById("config")
 var checkboxNotConnectionHosvital = document.getElementById("work-with-not-connection")
+var reasonWhyErrorBox = document.getElementById("reason-why-error")
 
 
 function initApp() {
@@ -24,7 +25,13 @@ function initApp() {
         localStorage.setItem("STATE-DB-HOSVITAL", "online")
     }
 }
-
+checkboxError.onchange = ()=> {
+    if(checkboxError.checked){
+        reasonWhyErrorBox.style.display = "inline"
+    }else {
+        reasonWhyErrorBox.style.display = "none"
+    }
+}
 configConnection.onclick = () => {
     var connectionButton = document.getElementById("config-submenu")
     if (connectionButton.style.display == "" || connectionButton.style.display == "none") {
@@ -344,11 +351,14 @@ function buttonSender() {
                 break;
         }
         if (documentId != "" && documentId.length > 5 && names != "" && lastnames != "" && dateHc != "" && typeId != "") {
+            var descriptionError = 0
             // checking if the patient has errors
             if (checkboxError.checked) {
                 patientErrors = true
+                descriptionError = reasonWhyErrorBox.value
             } else {
                 patientErrors = false
+                descriptionError = ""
             }
             // data in object
             var recordDataPatient = {
@@ -357,11 +367,12 @@ function buttonSender() {
                 patientLastnames: lastnames,
                 dateClinicHistory: dateHc,
                 typeId: typeId,
-                hasError: patientErrors
+                hasError: patientErrors.toString(),
+                descError: descriptionError
             }
             // converting to json
             var sendRecord = JSON.stringify(recordDataPatient)
-
+            console.log(sendRecord)
             async function sendRecordToServer() {
                 // setting the loading progress
                 onprogressRequest()
@@ -387,6 +398,7 @@ function buttonSender() {
                 } else {
                     if (stateRecord == "successful") {
                         stateProcessAlert("fa-user-check", "Registro éxitoso", "limegreen")
+                        hideSpecificBoxError()
                     }
                 }
                 IdPatientBox.value = ""
@@ -402,6 +414,10 @@ function buttonSender() {
             stateProcessAlert("fa-info-circle", "Faltan campos por llenar, por favor verifique", "orange")
         }
     }
+}
+function hideSpecificBoxError() {
+    reasonWhyErrorBox.style.display = "none"
+    reasonWhyErrorBox.value = ""
 }
 function stateProcessAlert(iconClass, message, backgroundColor) {
     var successfull = getDiv()
