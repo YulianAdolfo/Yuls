@@ -104,8 +104,8 @@ generateReportButton.onclick = () => {
 
     item1.innerHTML = "Fecha de historia"
     item2.innerHTML = "Fecha de registro"
-    item1.value = 1
-    item2.value = 0
+    item1.value = 0
+    item2.value = 1
     select.appendChild(item1)
     select.appendChild(item2)
     select.classList.add("select-of-report")
