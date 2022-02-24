@@ -506,6 +506,7 @@ function iconHeader(state) {
     icon[1].children[0].style.display = state
 }
 function tableInfo(contentQuery) {
+    console.log(JSON.parse(contentQuery[1]))
     if (contentQuery != null && (contentQuery.length-1) > 0) {
         var buttonDownload = document.getElementById("download-report")
         var table = document.getElementById("table-info-view-patient")
@@ -536,7 +537,11 @@ function tableInfo(contentQuery) {
                         td.innerHTML = data.PatientLastnames
                         break;
                     case 6:
-                        td.innerHTML = data.HasError
+                        if (data.HasError) {
+                            td.innerHTML = "SI"  
+                        }else {
+                            td.innerHTML = "NO"
+                        }
                         break;
                 }
                 tr.appendChild(td)
