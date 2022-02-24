@@ -26,7 +26,7 @@ type dataPatientHC struct {
 	TypeId             string
 	HasError           bool
 	DescError          string
-	ID_PATIENT         string
+	ID_PATIENT         int
 	DESCRIPTION_ERROR  string
 	DATE               string
 }
@@ -282,12 +282,11 @@ func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 	if err != nil {
 		fmt.Println("Error: " + err.Error())
 	}
-	fmt.Println("query: " + completeQuery)
 	var informationForReport []string
 	for query.Next() {
 		var dataReport dataPatientHC
 		//SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, ID_PATIENT, DESCRIPTION_ERROR, DATE
-		err = query.Scan(&dataReport.TypeId, &dataReport.IdPatient, &dataReport.DateClinicHistory, &dataReport.ActualDateRegistry, &dataReport.PatientNames, &dataReport.PatientLastnames, &dataReport.ID_PATIENT, &dataReport.DESCRIPTION_ERROR, &dataReport.DATE)
+		err = query.Scan(&dataReport.TypeId, &dataReport.IdPatient, &dataReport.DateClinicHistory, &dataReport.ActualDateRegistry, &dataReport.PatientNames, &dataReport.PatientLastnames, &dataReport.HasError, &dataReport.ID_PATIENT, &dataReport.DESCRIPTION_ERROR, &dataReport.DATE)
 		if err != nil {
 			fmt.Println("Error scanning : " + err.Error())
 		}
@@ -298,6 +297,7 @@ func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 			ActualDateRegistry: dataReport.ActualDateRegistry,
 			PatientNames:       dataReport.PatientNames,
 			PatientLastnames:   dataReport.PatientLastnames,
+			HasError:           dataReport.HasError,
 			ID_PATIENT:         dataReport.ID_PATIENT,
 			DESCRIPTION_ERROR:  dataReport.DESCRIPTION_ERROR,
 			DATE:               dataReport.DATE,
@@ -308,7 +308,6 @@ func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 		informationForReport = append(informationForReport, string(content))
 	}
 	// getting the number of registries actually
-	fmt.Println(informationForReport)
 	var amount dataPatientHC
 	err = connection.QueryRow("SELECT COUNT(IdPatient) FROM " + DATABASE_IN_USE).Scan(&amount.IdPatient)
 	if err != nil {
@@ -357,9 +356,9 @@ func PrepareQueryForReport(containsOnlyErrors, typeDate int, dateStart, dateEnd 
 	}
 
 	if containsOnlyErrors != 1 {
-		query = fmt.Sprintf("SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, ID_PATIENT, DESCRIPTION_ERROR, DATE FROM %s LEFT JOIN TABLE_ERRORS ON %s = TABLE_ERRORS.ID_PATIENT WHERE %s BETWEEN '%s' AND '%s' ORDER BY %s ASC", DATABASE_IN_USE, dbId, tableAndField, dateStart, dateEnd, dbId)
+		query = fmt.Sprintf("SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, hasError, ID_PATIENT, DESCRIPTION_ERROR, DATE FROM %s LEFT JOIN TABLE_ERRORS ON %s = TABLE_ERRORS.ID_PATIENT WHERE %s BETWEEN '%s' AND '%s' ORDER BY %s ASC", DATABASE_IN_USE, dbId, tableAndField, dateStart, dateEnd, dbId)
 	} else {
-		query = fmt.Sprintf("SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, ID_PATIENT, DESCRIPTION_ERROR, DATE FROM %s INNER JOIN TABLE_ERRORS WHERE %s = TABLE_ERRORS.ID_PATIENT AND %s BETWEEN '%s' AND '%s' ORDER BY %s", DATABASE_IN_USE, dbId, tableAndField, dateStart, dateEnd, dbId)
+		query = fmt.Sprintf("SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, hasError, ID_PATIENT, DESCRIPTION_ERROR, DATE FROM %s INNER JOIN TABLE_ERRORS WHERE %s = TABLE_ERRORS.ID_PATIENT AND %s BETWEEN '%s' AND '%s' ORDER BY %s", DATABASE_IN_USE, dbId, tableAndField, dateStart, dateEnd, dbId)
 	}
 	return query
 }
@@ -416,9 +415,9 @@ func patientNameHosvital(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func createExcelReport(contentData setDataExcel) (string, error) {
-	contentHeaders := []string{"Documento N°", "Tipo ID", "Fecha de historia", "Fecha de registro", "Nombres", "Apellidos", "¿Paciente con error?"}
-	indexColumns := []string{"A", "B", "C", "D", "E", "F", "G"}
-	columnsWidth := []float64{21.86, 10.71, 23.86, 23.86, 27, 27, 26}
+	contentHeaders := []string{"Documento N°", "Tipo ID", "Fecha de historia", "Fecha de registro", "Nombres", "Apellidos", "¿Paciente con error?", "Documento", "Descripción de error", "Fecha Error"}
+	indexColumns := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"}
+	columnsWidth := []float64{21.86, 10.71, 23.86, 23.86, 27, 27, 26, 35, 30, 30}
 	sheetName := "Reporte_Pacientes"
 	reportInExcel := excelize.NewFile()
 	reportInExcel.NewSheet(sheetName)
@@ -467,8 +466,18 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 				contentString = dataPatientExcel.PatientNames
 			case 5:
 				contentString = dataPatientExcel.PatientLastnames
-			default:
-				contentString = strconv.FormatBool(dataPatientExcel.HasError)
+			case 6:
+				if dataPatientExcel.HasError == true {
+					contentString = "SI"
+				} else {
+					contentString = "NO"
+				}
+			case 7:
+				contentString = strconv.Itoa(dataPatientExcel.ID_PATIENT)
+			case 8:
+				contentString = dataPatientExcel.DESCRIPTION_ERROR
+			case 9:
+				contentString = dataPatientExcel.DATE
 			}
 			reportInExcel.SetCellValue(sheetName, indexColumns[j]+strconv.Itoa(i+2), contentString)
 		}
