@@ -393,12 +393,14 @@ function buttonSender() {
                         .catch(error => rejected(error))
                 })
                 stateRecord = stateRecord.ContenMessage
-                console.log(stateRecord)
+                console.log(stateRecord + " this")
                 if (stateRecord == "already registered") {
                     stateProcessAlert("fa-user-times", "Usuario existente, se ha denegado el registro", "red")
                 } else if (stateRecord.includes("dial tcp: i/o timeout")) {
                     stateProcessAlert("fa-user-times", "Lo sentimos, inténtelo nuevamente (dial/tcp)", "red")
-                } else {
+                } else if (stateRecord.includes("denied")){
+                    alert("ACCESO DENEGADO AL SISTEMA: NO SE PUEDE REGISTRAR\nCOMUNICARSE CON EL AREA DE SISTEMAS")
+                }else {
                     if (stateRecord == "successful") {
                         stateProcessAlert("fa-user-check", "Registro éxitoso", "limegreen")
                         hideSpecificBoxError()
