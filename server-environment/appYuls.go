@@ -65,7 +65,7 @@ func newClinicHistory(dataPatienStruct dataPatientHC) error {
 		}
 		// verify if the patient has some errors
 		if dataPatienStruct.HasError {
-			err = insertDigitErrors(dataPatienStruct.IdPatient, dataPatienStruct.DescError, connection)
+			err = insertDigitErrors(dataPatienStruct.IdPatient, dataPatienStruct.DescError, dataPatienStruct.DateClinicHistory, connection)
 			if err != nil {
 				fmt.Println("Error: " + err.Error())
 				return err
@@ -73,7 +73,7 @@ func newClinicHistory(dataPatienStruct dataPatientHC) error {
 		}
 	} else {
 		if dataPatienStruct.HasError {
-			err := insertDigitErrors(dataPatienStruct.IdPatient, dataPatienStruct.DescError, connection)
+			err := insertDigitErrors(dataPatienStruct.IdPatient, dataPatienStruct.DescError, dataPatienStruct.DateClinicHistory, connection)
 			if err != nil {
 				fmt.Println("Error: " + err.Error())
 				return err
@@ -85,8 +85,8 @@ func newClinicHistory(dataPatienStruct dataPatientHC) error {
 	defer connection.Close()
 	return nil
 }
-func insertDigitErrors(id int, description string, connection *sql.DB) error {
-	query := "INSERT INTO TABLE_ERRORS (ID_PATIENT, DESCRIPTION_ERROR) VALUES (?,?)"
+func insertDigitErrors(id int, description, date string, connection *sql.DB) error {
+	query := "INSERT INTO TABLE_ERRORS (ID_PATIENT, DESCRIPTION_ERROR, DATE) VALUES (?,?, ?)"
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	statement, err := connection.PrepareContext(ctx, query)
@@ -94,7 +94,7 @@ func insertDigitErrors(id int, description string, connection *sql.DB) error {
 		fmt.Println("Error: " + err.Error())
 		return err
 	}
-	_, err = statement.ExecContext(ctx, id, description)
+	_, err = statement.ExecContext(ctx, id, description, date)
 	if err != nil {
 		fmt.Println("Error: " + err.Error())
 		return err
