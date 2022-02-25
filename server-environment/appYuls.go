@@ -467,7 +467,7 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 			case 5:
 				contentString = dataPatientExcel.PatientLastnames
 			case 6:
-				if dataPatientExcel.HasError == true {
+				if dataPatientExcel.HasError {
 					contentString = "SI"
 				} else {
 					contentString = "NO"
