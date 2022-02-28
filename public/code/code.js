@@ -10,7 +10,7 @@ var typeIdPatient = document.getElementById("type-id")
 var buttonSubmit = document.getElementById("button-submit")
 var app = document.getElementById("app-container")
 var generateReportButton = document.getElementById("report-info")
-var generateReportButtonByUser = document.getElementById("report-info-2")
+//var generateReportButtonByUser = document.getElementById("report-info-2")
 var Mainform = document.getElementById("form-registry")
 var configConnection = document.getElementById("config")
 var checkboxNotConnectionHosvital = document.getElementById("work-with-not-connection")
@@ -587,7 +587,7 @@ function closeInfoModal() {
 function showInfoModal() {
     document.getElementById("information-view-patient").style.display = "block"
 }
-function searchingByPatient() {
+/* function searchingByPatient() {
     var containerSearchByPatient = document.getElementById("search-by-patient")
     var boxQuery = document.getElementById("query-box")
     var searchBy = document.getElementById("type-search")
@@ -650,11 +650,11 @@ function searchingByPatient() {
             stateProcessAlert("fa-info-circle", "Faltan campos por llenar, por favor verifique", "orange")
         }
     }
-}
-generateReportButtonByUser.onclick = () => {
+} */
+/* generateReportButtonByUser.onclick = () => {
     searchingByPatient()
     document.getElementById("search-by-patient").style.display = "block"
     Mainform.style.display = "none"
     buttonCloseMenu.click()
-}
+} */
 initApp()
