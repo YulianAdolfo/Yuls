@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -44,9 +45,7 @@ type setDataExcel struct {
 	DataExcel []string
 }
 
-const (
-	DATABASE_IN_USE = "clinic_history_Test"
-)
+var DATABASE_IN_USE string
 
 // insert new patients
 func newClinicHistory(dataPatienStruct dataPatientHC) error {
@@ -490,6 +489,15 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 	}
 	return reportInExcel.Path, err
 }
+func readDBInUse() string {
+	fmt.Println("Leyendo base de datos para uso")
+	choicedDB, err := ioutil.ReadFile("../PARAMETERS/DB_PRODUCTION.txt")
+	if err != nil {
+		log.Print(err)
+		os.Exit(1)
+	}
+	return string(choicedDB)
+}
 func main() {
 	fmt.Println("Leyendo parametros de conexión...")
 	const PATH = "PARAMETERS/ADDRESS_IP_AND_PORT.txt"
@@ -500,10 +508,11 @@ func main() {
 	}
 	connectionParams := strings.TrimSpace(string(content))
 	if connectionParams != "" {
+		DATABASE_IN_USE = readDBInUse()
 		addressAnPort := strings.Split(connectionParams, ":")
 		publicElementsApp := http.FileServer(http.Dir("../public"))
 		http.Handle("/public/", http.StripPrefix("/public/", publicElementsApp))
-		fmt.Println("Using the database: " + DATABASE_IN_USE)
+		fmt.Println("Usando la base de datos: " + DATABASE_IN_USE)
 		http.HandleFunc("/record-patient", setPatientRecord)
 		http.HandleFunc("/get-data-patient", patientHosvital)
 		http.HandleFunc("/get-information-from-patient", getReport)
