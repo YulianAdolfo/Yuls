@@ -506,7 +506,6 @@ function iconHeader(state) {
     icon[1].children[0].style.display = state
 }
 function tableInfo(contentQuery) {
-    console.log(JSON.parse(contentQuery[1]))
     if (contentQuery != null && (contentQuery.length-1) > 0) {
         var buttonDownload = document.getElementById("download-report")
         var table = document.getElementById("table-info-view-patient")
@@ -572,7 +571,7 @@ function tableInfo(contentQuery) {
             buttonDownload.disabled = false
         }
         var amountPatients = JSON.parse(contentQuery[contentQuery.length-1])
-        document.getElementById("amount-patients").innerHTML = contentQuery.length-1 + "/"+ amountPatients.IdPatient + " registros obtenidos"
+        document.getElementById("amount-patients").innerHTML = contentQuery.length-1 + "/"+ amountPatients + " registros"
     } else {
         stateProcessAlert("fa-address-book", "No se han encontrado registros", "rgb(243, 98, 1)")
     }
