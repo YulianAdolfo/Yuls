@@ -1,1 +1,1 @@
-clinic_history_Test
+clinic_history
