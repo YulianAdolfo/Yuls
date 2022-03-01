@@ -335,8 +335,6 @@ func getReport(w http.ResponseWriter, r *http.Request) {
 		query := PrepareQueryForReport(checkErrors, genby, dateStart, dateEnd)
 
 		dataRequest, err := selectingDataToBuildReport(query)
-		fmt.Println("todo es array")
-		fmt.Println(dataRequest)
 		if err != nil {
 			fmt.Println("Error: " + err.Error())
 		}
