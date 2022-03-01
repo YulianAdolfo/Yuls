@@ -25,7 +25,6 @@ type dataPatientHC struct {
 	PatientLastnames   string
 	TypeId             string
 	HasError           bool
-	DescError          string
 	ID_PATIENT         int
 	DESCRIPTION_ERROR  string
 	DATE               string
@@ -68,7 +67,7 @@ func newClinicHistory(dataPatienStruct dataPatientHC) error {
 		}
 		// verify if the patient has some errors
 		if dataPatienStruct.HasError {
-			err = insertDigitErrors(dataPatienStruct.IdPatient, dataPatienStruct.DescError, dataPatienStruct.DateClinicHistory, connection)
+			err = insertDigitErrors(dataPatienStruct.IdPatient, dataPatienStruct.DESCRIPTION_ERROR, dataPatienStruct.DateClinicHistory, connection)
 			if err != nil {
 				fmt.Println("Error: " + err.Error())
 				return err
@@ -76,7 +75,7 @@ func newClinicHistory(dataPatienStruct dataPatientHC) error {
 		}
 	} else {
 		if dataPatienStruct.HasError {
-			err := insertDigitErrors(dataPatienStruct.IdPatient, dataPatienStruct.DescError, dataPatienStruct.DateClinicHistory, connection)
+			err := insertDigitErrors(dataPatienStruct.IdPatient, dataPatienStruct.DESCRIPTION_ERROR, dataPatienStruct.DateClinicHistory, connection)
 			if err != nil {
 				fmt.Println("Error: " + err.Error())
 				return err
@@ -313,7 +312,7 @@ func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 	if err != nil {
 		fmt.Println("Error: " + err.Error())
 	}
-	//informationForReport = append(informationForReport, )
+	informationForReport = append(informationForReport, strconv.Itoa(amount.IdPatient))
 	defer connection.Close()
 	return informationForReport, nil
 }
@@ -336,6 +335,8 @@ func getReport(w http.ResponseWriter, r *http.Request) {
 		query := PrepareQueryForReport(checkErrors, genby, dateStart, dateEnd)
 
 		dataRequest, err := selectingDataToBuildReport(query)
+		fmt.Println("todo es array")
+		fmt.Println(dataRequest)
 		if err != nil {
 			fmt.Println("Error: " + err.Error())
 		}
