@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -489,15 +491,38 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 	return reportInExcel.Path, err
 }
 func main() {
-	publicElementsApp := http.FileServer(http.Dir("../public"))
-	http.Handle("/public/", http.StripPrefix("/public/", publicElementsApp))
-	fmt.Println("Using the database: " + DATABASE_IN_USE)
-	http.HandleFunc("/record-patient", setPatientRecord)
-	http.HandleFunc("/get-data-patient", patientHosvital)
-	http.HandleFunc("/get-information-from-patient", getReport)
-	http.HandleFunc("/get-information-by-patient", getReportByPatient)
-	http.HandleFunc("/get-report-in-excel", reportInExcel)
-	http.HandleFunc("/data-patient-from-hosvital", patientNameHosvital)
-	http.HandleFunc("/Yuls", app)
-	http.ListenAndServe(":8005", nil)
+	fmt.Println("Leyendo parametros de conexión...")
+	const PATH = "PARAMETERS/ADDRESS_IP_AND_PORT.txt"
+	content, err := ioutil.ReadFile("../" + PATH)
+	if err != nil {
+		fmt.Println("Error: " + err.Error())
+		fmt.Println("Error el leer los parametros de conexión")
+	}
+	connectionParams := strings.TrimSpace(string(content))
+	if connectionParams != "" {
+		addressAnPort := strings.Split(connectionParams, ":")
+		publicElementsApp := http.FileServer(http.Dir("../public"))
+		http.Handle("/public/", http.StripPrefix("/public/", publicElementsApp))
+		fmt.Println("Using the database: " + DATABASE_IN_USE)
+		http.HandleFunc("/record-patient", setPatientRecord)
+		http.HandleFunc("/get-data-patient", patientHosvital)
+		http.HandleFunc("/get-information-from-patient", getReport)
+		http.HandleFunc("/get-information-by-patient", getReportByPatient)
+		http.HandleFunc("/get-report-in-excel", reportInExcel)
+		http.HandleFunc("/data-patient-from-hosvital", patientNameHosvital)
+		http.HandleFunc("/Yuls", app)
+		// opening the browers
+		go func() {
+			fmt.Println("Abriendo navegador/explorador...")
+			<-time.After(100 * time.Millisecond)
+			err := exec.Command("explorer", "http://"+addressAnPort[0]+":"+addressAnPort[1]+"/"+"Yuls").Run()
+			if err != nil {
+				fmt.Println("---------------------- Error --------------------")
+				log.Print(err)
+			}
+		}()
+		http.ListenAndServe(":"+addressAnPort[1], nil)
+	} else {
+		fmt.Println("SIN PARAMETROS DE CONEXIÓN")
+	}
 }
