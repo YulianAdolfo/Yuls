@@ -25,7 +25,7 @@ type dataPatientHC struct {
 	PatientLastnames   string
 	TypeId             string
 	HasError           bool
-	ID_PATIENT         int
+	IDPTN              int
 	DESCRIPTION_ERROR  string
 	DATE               string
 }
@@ -88,7 +88,7 @@ func newClinicHistory(dataPatienStruct dataPatientHC) error {
 	return nil
 }
 func insertDigitErrors(id int, description, date string, connection *sql.DB) error {
-	query := "INSERT INTO TABLE_ERRORS (ID_PATIENT, DESCRIPTION_ERROR, DATE) VALUES (?,?, ?)"
+	query := "INSERT INTO TABLE_ERRORS (IDPTN, DESCRIPTION_ERROR, DATE) VALUES (?,?, ?)"
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	statement, err := connection.PrepareContext(ctx, query)
@@ -284,10 +284,10 @@ func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 	var informationForReport []string
 	for query.Next() {
 		var dataReport dataPatientHC
-		//SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, ID_PATIENT, DESCRIPTION_ERROR, DATE
-		err = query.Scan(&dataReport.TypeId, &dataReport.IdPatient, &dataReport.DateClinicHistory, &dataReport.ActualDateRegistry, &dataReport.PatientNames, &dataReport.PatientLastnames, &dataReport.HasError, &dataReport.ID_PATIENT, &dataReport.DESCRIPTION_ERROR, &dataReport.DATE)
+		//SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, IDPTN, DESCRIPTION_ERROR, DATE
+		err = query.Scan(&dataReport.TypeId, &dataReport.IdPatient, &dataReport.DateClinicHistory, &dataReport.ActualDateRegistry, &dataReport.PatientNames, &dataReport.PatientLastnames, &dataReport.HasError, &dataReport.IDPTN, &dataReport.DESCRIPTION_ERROR, &dataReport.DATE)
 		if err != nil {
-			fmt.Println("Error scanning : " + err.Error())
+			fmt.Println(err.Error())
 		}
 		content, err := json.Marshal(dataPatientHC{
 			TypeId:             dataReport.TypeId,
@@ -297,7 +297,7 @@ func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 			PatientNames:       dataReport.PatientNames,
 			PatientLastnames:   dataReport.PatientLastnames,
 			HasError:           dataReport.HasError,
-			ID_PATIENT:         dataReport.ID_PATIENT,
+			IDPTN:              dataReport.IDPTN,
 			DESCRIPTION_ERROR:  dataReport.DESCRIPTION_ERROR,
 			DATE:               dataReport.DATE,
 		})
@@ -355,9 +355,9 @@ func PrepareQueryForReport(containsOnlyErrors, typeDate int, dateStart, dateEnd 
 	}
 
 	if containsOnlyErrors != 1 {
-		query = fmt.Sprintf("SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, hasError, ID_PATIENT, DESCRIPTION_ERROR, DATE FROM %s LEFT JOIN TABLE_ERRORS ON %s = TABLE_ERRORS.ID_PATIENT WHERE %s BETWEEN '%s' AND '%s' ORDER BY %s ASC", DATABASE_IN_USE, dbId, tableAndField, dateStart, dateEnd, dbId)
+		query = fmt.Sprintf("SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, hasError, IDPTN, DESCRIPTION_ERROR, DATE FROM %s LEFT JOIN TABLE_ERRORS ON %s = TABLE_ERRORS.IDPTN WHERE %s BETWEEN '%s' AND '%s' ORDER BY %s ASC", DATABASE_IN_USE, dbId, tableAndField, dateStart, dateEnd, dbId)
 	} else {
-		query = fmt.Sprintf("SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, hasError, ID_PATIENT, DESCRIPTION_ERROR, DATE FROM %s INNER JOIN TABLE_ERRORS WHERE %s = TABLE_ERRORS.ID_PATIENT AND %s BETWEEN '%s' AND '%s' ORDER BY %s", DATABASE_IN_USE, dbId, tableAndField, dateStart, dateEnd, dbId)
+		query = fmt.Sprintf("SELECT typeId, IdPatient, dateClinicHistory, actualDateRegistry, patientNames, patientLastnames, hasError, IDPTN, DESCRIPTION_ERROR, DATE FROM %s INNER JOIN TABLE_ERRORS WHERE %s = TABLE_ERRORS.IDPTN AND %s BETWEEN '%s' AND '%s' ORDER BY %s", DATABASE_IN_USE, dbId, tableAndField, dateStart, dateEnd, dbId)
 	}
 	return query
 }
@@ -472,7 +472,7 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 					contentString = "NO"
 				}
 			case 7:
-				contentString = strconv.Itoa(dataPatientExcel.ID_PATIENT)
+				contentString = strconv.Itoa(dataPatientExcel.IDPTN)
 			case 8:
 				contentString = dataPatientExcel.DESCRIPTION_ERROR
 			case 9:
