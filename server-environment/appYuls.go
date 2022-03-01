@@ -126,8 +126,6 @@ func setPatientRecord(w http.ResponseWriter, r *http.Request) {
 		}
 		var dataPatientHc dataPatientHC
 		json.Unmarshal(bodyRequest, &dataPatientHc)
-		// getting the actual date
-		fmt.Println(dataPatientHc)
 		dataPatientHc.ActualDateRegistry = time.Now().String()
 		// function to insert new records
 		err = newClinicHistory(dataPatientHc)
