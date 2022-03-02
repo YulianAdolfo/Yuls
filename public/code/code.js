@@ -307,8 +307,8 @@ function buttonSender() {
         // getting values from boxes in form
         var documentId = IdPatientBox.value
         var typeId = typeIdPatient.value
-        var names = boxNames.value
-        var lastnames = boxLastnames.value
+        var names = boxNames.value.toUpperCase()
+        var lastnames = boxLastnames.value.toUpperCase()
         var dateHc = dateRegistry.value
         var patientErrors = checkboxError.value
 
@@ -356,11 +356,9 @@ function buttonSender() {
             if (checkboxError.checked) {
                 patientErrors = true
                 descriptionError = reasonWhyErrorBox.value
-                console.log("tiene errores")
             } else {
                 patientErrors = false
                 descriptionError = ""
-                console.log("no tiene erorres")
             }
             // data in object
             var recordDataPatient = {
@@ -370,11 +368,10 @@ function buttonSender() {
                 dateClinicHistory: dateHc,
                 typeId: typeId,
                 hasError: patientErrors,
-                descError: descriptionError
+                DESCRIPTION_ERROR: descriptionError
             }
             // converting to json
             var sendRecord = JSON.stringify(recordDataPatient)
-            console.log(sendRecord)
             async function sendRecordToServer() {
                 // setting the loading progress
                 onprogressRequest()
@@ -393,7 +390,6 @@ function buttonSender() {
                         .catch(error => rejected(error))
                 })
                 stateRecord = stateRecord.ContenMessage
-                console.log(stateRecord + " this")
                 if (stateRecord == "already registered") {
                     stateProcessAlert("fa-user-times", "Usuario existente, se ha denegado el registro", "red")
                 } else if (stateRecord.includes("dial tcp: i/o timeout")) {
