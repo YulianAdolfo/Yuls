@@ -413,7 +413,7 @@ func patientNameHosvital(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func createExcelReport(contentData setDataExcel) (string, error) {
-	contentHeaders := []string{"Documento N°", "Tipo ID", "Fecha de historia", "Fecha de registro", "Nombres", "Apellidos", "¿Paciente con error?", "Documento", "Descripción de error", "Fecha Error"}
+	contentHeaders := []string{"Documento N°", "Tipo ID", "Fecha de historia", "Fecha de registro", "Nombres", "Apellidos", "¿Error de digitación?", "Documento", "Descripción de error", "Fecha Error"}
 	indexColumns := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"}
 	columnsWidth := []float64{21.86, 10.71, 23.86, 23.86, 27, 27, 26, 35, 30, 30}
 	sheetName := "Reporte_Pacientes"
