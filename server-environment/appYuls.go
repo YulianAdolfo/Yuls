@@ -443,7 +443,7 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 	// applying styles
 	reportInExcel.SetCellStyle(sheetName, indexColumns[0]+strconv.Itoa(1), indexColumns[len(indexColumns)-1]+strconv.Itoa(1), styleReport)
 	// inserting data
-	for i := 0; i < len(contentData.DataExcel); i++ {
+	for i := 0; i < len(contentData.DataExcel)-1; i++ {
 		var dataPatientExcel dataPatientHC
 		err := json.Unmarshal([]byte(contentData.DataExcel[i]), &dataPatientExcel)
 		if err != nil {
