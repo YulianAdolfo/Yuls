@@ -47,6 +47,8 @@ type setDataExcel struct {
 
 var DATABASE_IN_USE string
 
+const VERSION = "1.1.0"
+
 // insert new patients
 func newClinicHistory(dataPatienStruct dataPatientHC) error {
 	connection := getConnectionDB()
@@ -167,7 +169,7 @@ func patientHosvital(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func app(w http.ResponseWriter, r *http.Request) {
-	developerName := struct{ DevName string }{DevName: "Diseñado y desarrollado por Yulian Adolfo Rojas"}
+	developerName := struct{ DevName string }{DevName: "Diseñado y desarrollado por Yulian Adolfo Rojas - Versión: " + VERSION}
 	appTemplate := template.Must(template.ParseFiles("../client-environment/app.html"))
 	appTemplate.Execute(w, developerName)
 }
