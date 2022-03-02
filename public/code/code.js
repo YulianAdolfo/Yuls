@@ -99,7 +99,7 @@ generateReportButton.onclick = () => {
     var item1 = getOptions()
     var item2 = getOptions()
 
-    var checkPatientErrors = createCheckboxes("patient-errors", "Generar solo pacientes con errores")
+    var checkPatientErrors = createCheckboxes("patient-errors", "Solo con errores de digitación")
     checkPatientErrors.style.fontSize = "18px"
 
     item1.innerHTML = "Fecha de historia"
