@@ -48,7 +48,7 @@ type setDataExcel struct {
 var DATABASE_IN_USE string
 var BACKUP_FILE_NAME = getFilenameBackups() + getDate() + getExt()
 
-const VERSION = "1.1.0"
+const VERSION = "1.2.0"
 
 // insert new patients
 func backup(dataPatienStruct dataPatientHC) {
@@ -519,7 +519,7 @@ func getPathBackup() string {
 	return "../backups/"
 }
 func saveDataInLocalBackup(data string) error {
-	file, err := os.OpenFile(BACKUP_FILE_NAME, os.O_APPEND|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(getPathBackup()+"/"+BACKUP_FILE_NAME, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Print("Error: " + err.Error())
 		return err
@@ -536,7 +536,7 @@ func main() {
 	_, err := os.Stat(getPathBackup() + "/" + BACKUP_FILE_NAME)
 	if os.IsNotExist(err) {
 		fmt.Println("Creating backup file on specified path...")
-		_, err := os.Create(BACKUP_FILE_NAME)
+		_, err := os.Create(getPathBackup() + "/" + BACKUP_FILE_NAME)
 		if err != nil {
 			log.Print("Error creating the backup file: " + err.Error())
 		}
