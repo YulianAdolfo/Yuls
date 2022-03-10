@@ -510,7 +510,7 @@ func getDate() string {
 	return time.Now().Format("01-02-2006")
 }
 func getFilenameBackups() string {
-	return "Yuls-Backup-"
+	return "Yuls-Backup(mm-dd-aaaa)-"
 }
 func getExt() string {
 	return ".txt"
