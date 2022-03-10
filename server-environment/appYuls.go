@@ -516,7 +516,7 @@ func getExt() string {
 	return ".txt"
 }
 func getPathBackup() string {
-	return "./"
+	return "../backups/"
 }
 func saveDataInLocalBackup(data string) error {
 	file, err := os.OpenFile(BACKUP_FILE_NAME, os.O_APPEND|os.O_WRONLY, 0600)
