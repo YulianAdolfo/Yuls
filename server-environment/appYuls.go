@@ -46,11 +46,19 @@ type setDataExcel struct {
 }
 
 var DATABASE_IN_USE string
+var BACKUP_FILE_NAME = getFilenameBackups() + getDate() + getExt()
 
 const VERSION = "1.1.0"
 
 // insert new patients
+func backup(dataPatienStruct dataPatientHC) {
+	line := dataPatienStruct.ActualDateRegistry + ";" + dataPatienStruct.DateClinicHistory + ";" + strconv.Itoa(dataPatienStruct.IdPatient) + ";" + dataPatienStruct.PatientNames + ";" + dataPatienStruct.PatientLastnames + ";" + dataPatienStruct.TypeId + ";" + strconv.FormatBool(dataPatienStruct.HasError) + ";" + dataPatienStruct.DESCRIPTION_ERROR + ";" + dataPatienStruct.DATE + "\n"
+	if err := saveDataInLocalBackup(line); err != nil {
+		log.Print("Error saving the data in local way: " + err.Error())
+	}
+}
 func newClinicHistory(dataPatienStruct dataPatientHC) error {
+	go backup(dataPatienStruct)
 	connection := getConnectionDB()
 	knowExistancePatient := thisPatientExists(strconv.Itoa(dataPatienStruct.IdPatient))
 	if knowExistancePatient != 1 {
@@ -498,7 +506,42 @@ func readDBInUse() string {
 	}
 	return string(choicedDB)
 }
+func getDate() string {
+	return time.Now().Format("01-02-2006")
+}
+func getFilenameBackups() string {
+	return "Yuls-Backup-"
+}
+func getExt() string {
+	return ".txt"
+}
+func getPathBackup() string {
+	return "./"
+}
+func saveDataInLocalBackup(data string) error {
+	file, err := os.OpenFile(BACKUP_FILE_NAME, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		log.Print("Error: " + err.Error())
+		return err
+	}
+	defer file.Close()
+
+	if _, err := file.WriteString(data); err != nil {
+		return err
+	}
+	return nil
+}
 func main() {
+	// Eval file to backup
+	_, err := os.Stat(getPathBackup() + "/" + BACKUP_FILE_NAME)
+	if os.IsNotExist(err) {
+		fmt.Println("Creating backup file on specified path...")
+		_, err := os.Create(BACKUP_FILE_NAME)
+		if err != nil {
+			log.Print("Error creating the backup file: " + err.Error())
+		}
+		fmt.Println("File created")
+	}
 	fmt.Println("Leyendo parametros de conexión...")
 	const PATH = "PARAMETERS/ADDRESS_IP_AND_PORT.txt"
 	content, err := ioutil.ReadFile("../" + PATH)
