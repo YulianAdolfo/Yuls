@@ -396,6 +396,8 @@ function buttonSender() {
                     stateProcessAlert("fa-user-times", "Lo sentimos, inténtelo nuevamente (dial/tcp)", "red")
                 } else if (stateRecord.includes("denied")){
                     alert("ACCESO DENEGADO AL SISTEMA: NO SE PUEDE REGISTRAR\nCOMUNICARSE CON EL AREA DE SISTEMAS")
+                }else if (stateRecord.includes("already")) {
+                    alert("El paciente NO se pudo registar, se ha alcanzado el límite máximo de conexiones, ")
                 }else {
                     if (stateRecord == "successful") {
                         stateProcessAlert("fa-user-check", "Registro éxitoso", "limegreen")
@@ -510,7 +512,7 @@ function tableInfo(contentQuery) {
         for (var i = 0; i < contentQuery.length-1; i++) {
             var tr = document.createElement("tr")
             var data = JSON.parse(contentQuery[i])
-            for (var j = 0; j < 7; j++) {
+            for (var j = 0; j < 6; j++) {
                 var td = document.createElement("td")
                 switch (j) {
                     case 0:
@@ -530,13 +532,6 @@ function tableInfo(contentQuery) {
                         break;
                     case 5:
                         td.innerHTML = data.PatientLastnames
-                        break;
-                    case 6:
-                        if (data.HasError) {
-                            td.innerHTML = "SI"  
-                        }else {
-                            td.innerHTML = "NO"
-                        }
                         break;
                 }
                 tr.appendChild(td)
