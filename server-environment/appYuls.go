@@ -23,7 +23,7 @@ import (
 type dataPatientHC struct {
 	ActualDateRegistry string
 	DateClinicHistory  string
-	IdPatient          int
+	IdPatient          string
 	PatientNames       string
 	PatientLastnames   string
 	TypeId             string
@@ -52,7 +52,7 @@ const VERSION = "1.3.1"
 
 // insert new patients
 func backup(dataPatienStruct dataPatientHC) {
-	line := dataPatienStruct.ActualDateRegistry + ";" + dataPatienStruct.DateClinicHistory + ";" + strconv.Itoa(dataPatienStruct.IdPatient) + ";" + dataPatienStruct.PatientNames + ";" + dataPatienStruct.PatientLastnames + ";" + dataPatienStruct.TypeId + ";" + strconv.FormatBool(dataPatienStruct.HasError) + ";" + dataPatienStruct.DESCRIPTION_ERROR + ";" + dataPatienStruct.DATE + "\n"
+	line := dataPatienStruct.ActualDateRegistry + ";" + dataPatienStruct.DateClinicHistory + ";" + dataPatienStruct.IdPatient + ";" + dataPatienStruct.PatientNames + ";" + dataPatienStruct.PatientLastnames + ";" + dataPatienStruct.TypeId + ";" + strconv.FormatBool(dataPatienStruct.HasError) + ";" + dataPatienStruct.DESCRIPTION_ERROR + ";" + dataPatienStruct.DATE + "\n"
 	if err := saveDataInLocalBackup(line); err != nil {
 		log.Print("Error saving the data in local way: " + err.Error())
 	}
@@ -60,7 +60,7 @@ func backup(dataPatienStruct dataPatientHC) {
 func newClinicHistory(dataPatienStruct dataPatientHC) error {
 	go backup(dataPatienStruct)
 	connection := getConnectionDB()
-	knowExistancePatient := thisPatientExists(strconv.Itoa(dataPatienStruct.IdPatient))
+	knowExistancePatient := thisPatientExists(dataPatienStruct.IdPatient)
 	if knowExistancePatient != 1 {
 		insertQuery := fmt.Sprintf("INSERT INTO %s (actualDateRegistry, dateClinicHistory, IdPatient, patientNames, patientLastnames, typeId, hasError) VALUES (?,?,?,?,?,?,?)", DATABASE_IN_USE)
 		contextQuery, cancelFunction := context.WithTimeout(context.Background(), 5*time.Second)
@@ -98,7 +98,7 @@ func newClinicHistory(dataPatienStruct dataPatientHC) error {
 	defer connection.Close()
 	return nil
 }
-func insertDigitErrors(id int, description, date string, connection *sql.DB) error {
+func insertDigitErrors(id, description, date string, connection *sql.DB) error {
 	query := "INSERT INTO TABLE_ERRORS (IDPTN, DESCRIPTION_ERROR, DATE) VALUES (?,?, ?)"
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -182,6 +182,7 @@ func app(w http.ResponseWriter, r *http.Request) {
 	appTemplate.Execute(w, developerName)
 }
 func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) (string, error) {
+	fmt.Println("se va a buscar el valor " + id)
 	contextConnection := context.Background()
 	// check if the connection is alive
 	err := connectionSqlServer.PingContext(contextConnection)
@@ -321,7 +322,7 @@ func selectingDataToBuildReport(completeQuery string) ([]string, error) {
 	if err != nil {
 		fmt.Println("Error: " + err.Error())
 	}
-	informationForReport = append(informationForReport, strconv.Itoa(amount.IdPatient))
+	informationForReport = append(informationForReport, amount.IdPatient)
 	defer connection.Close()
 	return informationForReport, nil
 }
@@ -463,7 +464,7 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 			var contentString string
 			switch j {
 			case 0:
-				contentString = strconv.Itoa(dataPatientExcel.IdPatient)
+				contentString = dataPatientExcel.IdPatient
 			case 1:
 				contentString = dataPatientExcel.TypeId
 			case 2:
