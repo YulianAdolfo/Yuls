@@ -48,7 +48,7 @@ type setDataExcel struct {
 var DATABASE_IN_USE string
 var BACKUP_FILE_NAME = getFilenameBackups() + getDate() + getExt()
 
-const VERSION = "1.3.1"
+const VERSION = "1.3.2"
 
 // insert new patients
 func backup(dataPatienStruct dataPatientHC) {
