@@ -251,7 +251,7 @@ func getPatientsByNameFromHosvital(patientName string, connectionSqlServer *sql.
 
 	}
 	// if the connection is alive so create the sql qery
-	sqlGetInfo := "SELECT TOP 50\n" +
+	sqlGetInfo := "SELECT TOP 100\n" +
 		"RTRIM(MPCedu),\n" +
 		"RTRIM(CONCAT(CONCAT(LEFT(MPNom1, 1), LOWER(RIGHT(RTRIM(MPNom1), LEN(MPNom1)-1))),' ',IIF (LEN(RTRIM(MPNom2))=0,'', CONCAT(LEFT(MPNom2, 1), LOWER(RIGHT(RTRIM(MPNom2), LEN(MPNom2)-1)))))),\n+" +
 		"RTRIM(CONCAT(CONCAT(LEFT(MPApe1, 1), LOWER(RIGHT(RTRIM(MPApe1), LEN(MPApe1)-1))),' ',IIF  (LEN(RTRIM(MPApe2))=0,'', CONCAT(LEFT(MPApe2, 1), LOWER(RIGHT(RTRIM(MPApe2), LEN(MPApe2)-1))))))\n" +
