@@ -173,9 +173,11 @@ function deleteActualWin(app, div) {
 }
 //const IP_SERVER = "http://192.168.11.105:8005/"
 IdPatientBox.onchange = async () => {
-    var id = parseInt(IdPatientBox.value)
+    var id = IdPatientBox.value
     var stringIdQuery = IdPatientBox.value
     var getInfoPatient = null
+    console.log(id)
+    console.log(!isNaN(id))
     if (localStorage.getItem("STATE-DB-HOSVITAL") === "online") {
         if (!isNaN(id) || stringIdQuery.substring(0,3) == "-n " && stringIdQuery.substring(3, stringIdQuery.length).length >= 3) {
             var stateMessage = " | consultando..."
@@ -362,7 +364,7 @@ function buttonSender() {
             }
             // data in object
             var recordDataPatient = {
-                idPatient: parseInt(documentId),
+                idPatient: documentId,
                 patientNames: names,
                 patientLastnames: lastnames,
                 dateClinicHistory: dateHc,
