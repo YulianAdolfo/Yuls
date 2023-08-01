@@ -307,7 +307,8 @@ buttonSender()
 function buttonSender() {
     buttonSubmit.onclick = () => {
         // getting values from boxes in form
-        var documentId = IdPatientBox.value
+        var documentId = IdPatientBox.value.trim()
+        console.log("without spaces: " + documentId)
         var typeId = typeIdPatient.value
         var names = boxNames.value.toUpperCase()
         var lastnames = boxLastnames.value.toUpperCase()
@@ -372,6 +373,7 @@ function buttonSender() {
                 hasError: patientErrors,
                 DESCRIPTION_ERROR: descriptionError
             }
+            console.log("data: ", recordDataPatient.idPatient)
             // converting to json
             var sendRecord = JSON.stringify(recordDataPatient)
             async function sendRecordToServer() {
