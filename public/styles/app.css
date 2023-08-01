@@ -561,3 +561,7 @@ body {
     color: #00adef;
     cursor: pointer;
 }
+#link-db {
+    color: white;
+    text-decoration: none;
+}
