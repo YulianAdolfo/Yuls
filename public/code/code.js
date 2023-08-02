@@ -176,8 +176,6 @@ IdPatientBox.onchange = async () => {
     var id = IdPatientBox.value
     var stringIdQuery = IdPatientBox.value
     var getInfoPatient = null
-    console.log(id)
-    console.log(!isNaN(id))
     if (localStorage.getItem("STATE-DB-HOSVITAL") === "online") {
         if (!isNaN(id) || stringIdQuery.substring(0,3) == "-n " && stringIdQuery.substring(3, stringIdQuery.length).length >= 3) {
             var stateMessage = " | consultando..."
@@ -308,7 +306,6 @@ function buttonSender() {
     buttonSubmit.onclick = () => {
         // getting values from boxes in form
         var documentId = IdPatientBox.value.trim()
-        console.log("without spaces: " + documentId)
         var typeId = typeIdPatient.value
         var names = boxNames.value.toUpperCase()
         var lastnames = boxLastnames.value.toUpperCase()
@@ -373,7 +370,6 @@ function buttonSender() {
                 hasError: patientErrors,
                 DESCRIPTION_ERROR: descriptionError
             }
-            console.log("data: ", recordDataPatient.idPatient)
             // converting to json
             var sendRecord = JSON.stringify(recordDataPatient)
             async function sendRecordToServer() {
@@ -581,74 +577,4 @@ function closeInfoModal() {
 function showInfoModal() {
     document.getElementById("information-view-patient").style.display = "block"
 }
-/* function searchingByPatient() {
-    var containerSearchByPatient = document.getElementById("search-by-patient")
-    var boxQuery = document.getElementById("query-box")
-    var searchBy = document.getElementById("type-search")
-    var buttonSearch = document.getElementById("button-query")
-
-    var buttonClose = document.getElementById("return-arrow")
-    buttonClose.onclick = () => {
-        containerSearchByPatient.style.display = "none"
-        Mainform.style.display = "block"
-        boxQuery.value = ""
-    }
-
-    buttonSearch.onclick = async () => {
-        var queryString = boxQuery.value
-        if (queryString != "" && queryString.length >= 5) {
-            var searchIn = searchBy.value
-            queryString = queryString.trim()
-            queryString = queryString.replaceAll(",", " ")
-            queryString = queryString.split(" ")
-            for (var i = 0; i < queryString.length; i++) {
-                if (queryString[i] == "" || queryString[i] == " ") {
-                    queryString.splice(i, 1)
-                    i--
-                } else {
-                    if (searchIn == "0") {
-                        var verifyNumber = parseInt(queryString[i])
-                        if (!isNaN(verifyNumber)) {
-                            queryString[i] = verifyNumber
-                        } else {
-                            queryString.splice(i, 1)
-                            i--
-                        }
-                    }
-                }
-            }
-            queryString = queryString.join("|")
-            if (searchIn != "0") {
-                queryString = "'" + queryString+ "'"
-            }
-            if (queryString !="") {
-                            
-            var query = "?query-string=" + queryString + "&query-field="+searchIn
-            onprogressRequest()
-            var state = await new Promise((resolved, rejected) => {
-                fetch("/get-information-by-patient" + query, {
-                    method: "get"
-                })
-                    .then(data => data.json())
-                    .then(data => resolved(data))
-                    .catch(error => {
-                        rejected(error)
-                        removeLastElement()
-                        boxQuery.value = "" 
-                        stateProcessAlert("fa-question-circle", error + ". Unknown error or sintax.", "red")})
-            })
-            tableInfo(state)
-            removeLastElement()
-            }
-        }else {
-            stateProcessAlert("fa-info-circle", "Faltan campos por llenar, por favor verifique", "orange")
-        }
-    }
-} */
-/* generateReportButtonByUser.onclick = () => {
-    searchingByPatient()
-    document.getElementById("search-by-patient").style.display = "block"
-    Mainform.style.display = "none"
-    buttonCloseMenu.click()
-} */
 initApp()
