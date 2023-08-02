@@ -1,3 +1,4 @@
+localStorage.setItem("STATE-DB-HOSVITAL", "offline")
 var menu = document.getElementById("menu-panel")
 var buttonCloseMenu = document.getElementById("close-menu")
 var buttonOpenMenu = document.getElementById("open-menu")
@@ -547,7 +548,8 @@ function tableInfo(contentQuery) {
             closeInfoModal()
         }
         buttonDownload.onclick = async () => {
-            buttonDownload.disabled = true
+            alert("Acción no permitida para este versión\nPor favor copie y pegue la information en un excel manualmente.\nLamentos cualquier inconviniente que esto pueda causar.");
+            /* buttonDownload.disabled = true
             buttonDownload.style.backgroundColor = "#ddd"
             var dataExcel = {
                 DataExcel: contentQuery
@@ -563,7 +565,7 @@ function tableInfo(contentQuery) {
             })
             location.href = downlaodReport.Link
             buttonDownload.style.backgroundColor = "rgb(30, 219, 5)"
-            buttonDownload.disabled = false
+            buttonDownload.disabled = false */
         }
         var amountPatients = JSON.parse(contentQuery[contentQuery.length-1])
         document.getElementById("amount-patients").innerHTML = contentQuery.length-1 + "/"+ amountPatients + " registros"
@@ -581,74 +583,4 @@ function closeInfoModal() {
 function showInfoModal() {
     document.getElementById("information-view-patient").style.display = "block"
 }
-/* function searchingByPatient() {
-    var containerSearchByPatient = document.getElementById("search-by-patient")
-    var boxQuery = document.getElementById("query-box")
-    var searchBy = document.getElementById("type-search")
-    var buttonSearch = document.getElementById("button-query")
-
-    var buttonClose = document.getElementById("return-arrow")
-    buttonClose.onclick = () => {
-        containerSearchByPatient.style.display = "none"
-        Mainform.style.display = "block"
-        boxQuery.value = ""
-    }
-
-    buttonSearch.onclick = async () => {
-        var queryString = boxQuery.value
-        if (queryString != "" && queryString.length >= 5) {
-            var searchIn = searchBy.value
-            queryString = queryString.trim()
-            queryString = queryString.replaceAll(",", " ")
-            queryString = queryString.split(" ")
-            for (var i = 0; i < queryString.length; i++) {
-                if (queryString[i] == "" || queryString[i] == " ") {
-                    queryString.splice(i, 1)
-                    i--
-                } else {
-                    if (searchIn == "0") {
-                        var verifyNumber = parseInt(queryString[i])
-                        if (!isNaN(verifyNumber)) {
-                            queryString[i] = verifyNumber
-                        } else {
-                            queryString.splice(i, 1)
-                            i--
-                        }
-                    }
-                }
-            }
-            queryString = queryString.join("|")
-            if (searchIn != "0") {
-                queryString = "'" + queryString+ "'"
-            }
-            if (queryString !="") {
-                            
-            var query = "?query-string=" + queryString + "&query-field="+searchIn
-            onprogressRequest()
-            var state = await new Promise((resolved, rejected) => {
-                fetch("/get-information-by-patient" + query, {
-                    method: "get"
-                })
-                    .then(data => data.json())
-                    .then(data => resolved(data))
-                    .catch(error => {
-                        rejected(error)
-                        removeLastElement()
-                        boxQuery.value = "" 
-                        stateProcessAlert("fa-question-circle", error + ". Unknown error or sintax.", "red")})
-            })
-            tableInfo(state)
-            removeLastElement()
-            }
-        }else {
-            stateProcessAlert("fa-info-circle", "Faltan campos por llenar, por favor verifique", "orange")
-        }
-    }
-} */
-/* generateReportButtonByUser.onclick = () => {
-    searchingByPatient()
-    document.getElementById("search-by-patient").style.display = "block"
-    Mainform.style.display = "none"
-    buttonCloseMenu.click()
-} */
 initApp()
