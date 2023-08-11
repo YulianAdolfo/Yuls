@@ -1,3 +1,4 @@
+localStorage.setItem("STATE-DB-HOSVITAL", "offline")
 var menu = document.getElementById("menu-panel")
 var buttonCloseMenu = document.getElementById("close-menu")
 var buttonOpenMenu = document.getElementById("open-menu")
@@ -543,7 +544,8 @@ function tableInfo(contentQuery) {
             closeInfoModal()
         }
         buttonDownload.onclick = async () => {
-            buttonDownload.disabled = true
+            alert("Acción no permitida para este versión\nPor favor copie y pegue la information en un excel manualmente.\nLamentos cualquier inconviniente que esto pueda causar.");
+            /* buttonDownload.disabled = true
             buttonDownload.style.backgroundColor = "#ddd"
             var dataExcel = {
                 DataExcel: contentQuery
@@ -559,7 +561,7 @@ function tableInfo(contentQuery) {
             })
             location.href = downlaodReport.Link
             buttonDownload.style.backgroundColor = "rgb(30, 219, 5)"
-            buttonDownload.disabled = false
+            buttonDownload.disabled = false */
         }
         var amountPatients = JSON.parse(contentQuery[contentQuery.length-1])
         document.getElementById("amount-patients").innerHTML = contentQuery.length-1 + "/"+ amountPatients + " registros"
