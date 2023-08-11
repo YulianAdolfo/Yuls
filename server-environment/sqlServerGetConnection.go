@@ -5,20 +5,17 @@ import (
 	"database/sql"
 	"fmt"
 
+	"Yuls/readerparams"
+
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
-const (
-	serverSql    = "192.168.1.198"
-	portSql      = 1433
-	userSql      = "hvt_clinico"
-	passwordSql  = "hvt_clinico2015"
-	databaseName = "HOSVITAL"
-)
-
 func sqlServerGetConnection() *sql.DB {
+	// getting parameters from the json file
+	serverSql, userSql, passwordSql, portSql, databaseName := readerparams.ReadConnectionSqlParameters()
 	// creating the connection to sql server
-	connectionQueryParams := fmt.Sprintf("server=%s;user id=%s;password=%s;port=%d;database=%s;", serverSql, userSql, passwordSql, portSql, databaseName)
+	connectionQueryParams := fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s;", serverSql, userSql, passwordSql, portSql, databaseName)
+	fmt.Println("query: " + connectionQueryParams)
 	// creating the connection pool
 	databaseConnection, err := sql.Open("mssql", connectionQueryParams)
 	if err != nil {
