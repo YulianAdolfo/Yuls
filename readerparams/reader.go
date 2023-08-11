@@ -34,6 +34,22 @@ func ReadConnectionSqlParameters() (string, string, string, string, string) {
 	return server, username, password, port, database
 
 }
+func ReadConnectionMySqlParameters() (string, string, string, string, string, string) {
+	file, err := initReader()
+	if err != nil {
+		fmt.Println("¡Error al leer parametros! ", err)
+	}
+	data := readParameters(file)
+	username := data["MysqlRemoteConnection"].(map[string]interface{})["Username"].(string)
+	password := data["MysqlRemoteConnection"].(map[string]interface{})["Password"].(string)
+	typeConnection := data["MysqlRemoteConnection"].(map[string]interface{})["TypeConn"].(string)
+	server := data["MysqlRemoteConnection"].(map[string]interface{})["Server"].(string)
+	port := data["MysqlRemoteConnection"].(map[string]interface{})["Port"].(string)
+	database := data["MysqlRemoteConnection"].(map[string]interface{})["Database"].(string)
+	defer file.Close()
+	return server, username, typeConnection, password, port, database
+
+}
 func readParameters(file *os.File) map[string]interface{} {
 	valuesinJson, _ := io.ReadAll(file)
 	var valuesFromJson map[string]interface{}
