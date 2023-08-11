@@ -1,0 +1,9 @@
+{
+    "SqlHosvitalConnection" : {
+        "Server": "192.168.1.198",
+        "Port":"1433",
+        "Username": "hvt_clinico",
+        "Password": "hvt_clinico2015",
+        "Database":"HOSVITAL"
+    }
+}
