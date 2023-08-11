@@ -11,10 +11,11 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 	"time"
+
+	"Yuls/readerparams"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -533,8 +534,10 @@ func saveDataInLocalBackup(data string) error {
 	return nil
 }
 func main() {
+	readerparams.ReadConnectionSqlParameters()
+	sqlServerGetConnection()
 	// Eval file to backup
-	_, err := os.Stat(getPathBackup() + "/" + BACKUP_FILE_NAME)
+	/* _, err := os.Stat(getPathBackup() + "/" + BACKUP_FILE_NAME)
 	if os.IsNotExist(err) {
 		fmt.Println("Creating backup file on specified path...")
 		_, err := os.Create(getPathBackup() + "/" + BACKUP_FILE_NAME)
@@ -577,5 +580,5 @@ func main() {
 		http.ListenAndServe(":"+addressAnPort[1], nil)
 	} else {
 		fmt.Println("SIN PARAMETROS DE CONEXIÓN")
-	}
+	} */
 }
