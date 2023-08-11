@@ -47,7 +47,7 @@ func ReadConnectionMySqlParameters() (string, string, string, string, string, st
 	port := data["MysqlRemoteConnection"].(map[string]interface{})["Port"].(string)
 	database := data["MysqlRemoteConnection"].(map[string]interface{})["Database"].(string)
 	defer file.Close()
-	return server, username, typeConnection, password, port, database
+	return username, password, typeConnection, server, port, database
 
 }
 func readParameters(file *os.File) map[string]interface{} {
