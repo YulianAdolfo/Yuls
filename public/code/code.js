@@ -1,4 +1,3 @@
-localStorage.setItem("STATE-DB-HOSVITAL", "offline")
 var menu = document.getElementById("menu-panel")
 var buttonCloseMenu = document.getElementById("close-menu")
 var buttonOpenMenu = document.getElementById("open-menu")
