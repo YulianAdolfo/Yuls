@@ -5,5 +5,13 @@
         "Username": "hvt_clinico",
         "Password": "hvt_clinico2015",
         "Database":"HOSVITAL"
+    },
+    "MysqlRemoteConnection" : {
+        "username ": "ipsucjyl_userRegisterCH",
+	    "password": "RegThisPatient.21Yuls*",
+	    "port": "3306",
+	    "host": "cp-31.webhostbox.net",
+	    "typeConn": "tcp",
+	    "databaseConn": "ipsucjyl_patient_clinic_history",
     }
 }
