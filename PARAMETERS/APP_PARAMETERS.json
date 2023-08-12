@@ -13,5 +13,9 @@
 	    "Password": "RegThisPatient.21Yuls*",
 	    "Database": "ipsucjyl_patient_clinic_history",
         "TypeConn": "tcp"
+    },
+    "LocalNetwork" : {
+        "IP": "",
+        "Port": "8005"
     }
 }
