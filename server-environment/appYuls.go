@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Yuls/readerparams"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -15,8 +16,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"Yuls/readerparams"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -48,7 +47,8 @@ type setDataExcel struct {
 }
 
 var DATABASE_IN_USE string
-var BACKUP_FILE_NAME = getFilenameBackups() + getDate() + getExt()
+
+//var BACKUP_FILE_NAME = getFilenameBackups() + getDate() + getExt()
 
 const VERSION = "1.3.3"
 
@@ -60,7 +60,7 @@ func backup(dataPatienStruct dataPatientHC) {
 	}
 }
 func newClinicHistory(dataPatienStruct dataPatientHC) error {
-	go backup(dataPatienStruct)
+	//go backup(dataPatienStruct)
 	connection := getConnectionDB()
 	knowExistancePatient := thisPatientExists(dataPatienStruct.IdPatient)
 	if knowExistancePatient != 1 {
@@ -522,7 +522,7 @@ func getPathBackup() string {
 	return "../backups/"
 }
 func saveDataInLocalBackup(data string) error {
-	file, err := os.OpenFile(getPathBackup()+"/"+BACKUP_FILE_NAME, os.O_APPEND|os.O_WRONLY, 0600)
+	/* file, err := os.OpenFile(getPathBackup()+"/"+BACKUP_FILE_NAME, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Print("Error: " + err.Error())
 		return err
@@ -532,6 +532,7 @@ func saveDataInLocalBackup(data string) error {
 	if _, err := file.WriteString(data); err != nil {
 		return err
 	}
+	return nil */
 	return nil
 }
 func main() {
@@ -540,16 +541,6 @@ func main() {
 	IP, port := readerparams.ReadLocalNetwork()
 	DATABASE_IN_USE = readerparams.ReadDataInUsage()
 	URL_SYSTEM_YULS := fmt.Sprintf("http://%s:%s/Yuls", IP, port)
-	// Eval file to backup
-	_, err := os.Stat(getPathBackup() + "/" + BACKUP_FILE_NAME)
-	if os.IsNotExist(err) {
-		fmt.Println("Creating backup file on specified path...")
-		_, err := os.Create(getPathBackup() + "/" + BACKUP_FILE_NAME)
-		if err != nil {
-			log.Print("Error creating the backup file: " + err.Error())
-		}
-		fmt.Println("File created")
-	}
 	publicElementsApp := http.FileServer(http.Dir("../public"))
 	http.Handle("/public/", http.StripPrefix("/public/", publicElementsApp))
 	fmt.Println("Usando la base de datos: " + DATABASE_IN_USE)
