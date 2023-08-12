@@ -57,7 +57,7 @@ func ReadDataInUsage() string {
 		fmt.Println("¡Error al leer parametros! ", err)
 	}
 	data := readParameters(file)
-	database := data["MysqlRemoteConnection"].(map[string]interface{})["Database"].(string)
+	database := data["MysqlRemoteConnection"].(map[string]interface{})["Table"].(string)
 	defer file.Close()
 	return database
 }
