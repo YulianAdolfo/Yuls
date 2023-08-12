@@ -478,11 +478,7 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 			case 5:
 				contentString = dataPatientExcel.PatientLastnames
 			case 6:
-				if dataPatientExcel.HasError {
-					contentString = "SI"
-				} else {
-					contentString = "NO"
-				}
+				contentString = "-"
 			case 7:
 				contentString = strconv.Itoa(dataPatientExcel.IDPTN)
 			case 8:
@@ -493,8 +489,8 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 			reportInExcel.SetCellValue(sheetName, indexColumns[j]+strconv.Itoa(i+2), contentString)
 		}
 	}
-
-	err = reportInExcel.SaveAs("../public/reports/Reporte.xlsx")
+	saveExelInPath := fmt.Sprintf("../public/temporal/Reporte-%v.xlsx", getDate())
+	err = reportInExcel.SaveAs(saveExelInPath)
 	if err != nil {
 		return "", nil
 	}
