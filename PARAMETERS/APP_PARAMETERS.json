@@ -9,9 +9,10 @@
     "MysqlRemoteConnection" : {
         "Server": "cp-31.webhostbox.net",
         "Port": "3306",
-        "Username ": "ipsucjyl_userRegisterCH",
+        "Username": "ipsucjyl_userRegisterCH",
 	    "Password": "RegThisPatient.21Yuls*",
 	    "Database": "ipsucjyl_patient_clinic_history",
+        "Table": "clinic_history",
         "TypeConn": "tcp"
     },
     "LocalNetwork" : {
