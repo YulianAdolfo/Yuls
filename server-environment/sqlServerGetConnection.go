@@ -15,7 +15,6 @@ func sqlServerGetConnection() *sql.DB {
 	serverSql, userSql, passwordSql, portSql, databaseName := readerparams.ReadConnectionSqlParameters()
 	// creating the connection to sql server
 	connectionQueryParams := fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s;", serverSql, userSql, passwordSql, portSql, databaseName)
-	fmt.Println("query: " + connectionQueryParams)
 	// creating the connection pool
 	databaseConnection, err := sql.Open("mssql", connectionQueryParams)
 	if err != nil {

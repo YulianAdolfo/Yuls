@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -534,10 +535,13 @@ func saveDataInLocalBackup(data string) error {
 	return nil
 }
 func main() {
-	readerparams.ReadConnectionSqlParameters()
-	sqlServerGetConnection()
+	fmt.Println("Preparando a Yuls, por favor espere...")
+	fmt.Println("Leyendo parametros de conexión Yuls...")
+	IP, port := readerparams.ReadLocalNetwork()
+	DATABASE_IN_USE = readerparams.ReadDataInUsage()
+	URL_SYSTEM_YULS := fmt.Sprintf("http://%s:%s/Yuls", IP, port)
 	// Eval file to backup
-	/* _, err := os.Stat(getPathBackup() + "/" + BACKUP_FILE_NAME)
+	_, err := os.Stat(getPathBackup() + "/" + BACKUP_FILE_NAME)
 	if os.IsNotExist(err) {
 		fmt.Println("Creating backup file on specified path...")
 		_, err := os.Create(getPathBackup() + "/" + BACKUP_FILE_NAME)
@@ -546,39 +550,25 @@ func main() {
 		}
 		fmt.Println("File created")
 	}
-	fmt.Println("Leyendo parametros de conexión...")
-	const PATH = "PARAMETERS/ADDRESS_IP_AND_PORT.txt"
-	content, err := ioutil.ReadFile("../" + PATH)
-	if err != nil {
-		fmt.Println("Error: " + err.Error())
-		fmt.Println("Error el leer los parametros de conexión")
-	}
-	connectionParams := strings.TrimSpace(string(content))
-	if connectionParams != "" {
-		DATABASE_IN_USE = readDBInUse()
-		addressAnPort := strings.Split(connectionParams, ":")
-		publicElementsApp := http.FileServer(http.Dir("../public"))
-		http.Handle("/public/", http.StripPrefix("/public/", publicElementsApp))
-		fmt.Println("Usando la base de datos: " + DATABASE_IN_USE)
-		http.HandleFunc("/record-patient", setPatientRecord)
-		http.HandleFunc("/get-data-patient", patientHosvital)
-		http.HandleFunc("/get-information-from-patient", getReport)
-		http.HandleFunc("/get-information-by-patient", getReportByPatient)
-		http.HandleFunc("/get-report-in-excel", reportInExcel)
-		http.HandleFunc("/data-patient-from-hosvital", patientNameHosvital)
-		http.HandleFunc("/Yuls", app)
-		// opening the browers
-		go func() {
-			fmt.Println("Abriendo navegador/explorador...")
-			<-time.After(100 * time.Millisecond)
-			err := exec.Command("explorer", "http://"+addressAnPort[0]+":"+addressAnPort[1]+"/"+"Yuls").Run()
-			if err != nil {
-				fmt.Println("---------------------- Error --------------------")
-				log.Print(err)
-			}
-		}()
-		http.ListenAndServe(":"+addressAnPort[1], nil)
-	} else {
-		fmt.Println("SIN PARAMETROS DE CONEXIÓN")
-	} */
+	publicElementsApp := http.FileServer(http.Dir("../public"))
+	http.Handle("/public/", http.StripPrefix("/public/", publicElementsApp))
+	fmt.Println("Usando la base de datos: " + DATABASE_IN_USE)
+	http.HandleFunc("/record-patient", setPatientRecord)
+	http.HandleFunc("/get-data-patient", patientHosvital)
+	http.HandleFunc("/get-information-from-patient", getReport)
+	http.HandleFunc("/get-information-by-patient", getReportByPatient)
+	http.HandleFunc("/get-report-in-excel", reportInExcel)
+	http.HandleFunc("/data-patient-from-hosvital", patientNameHosvital)
+	http.HandleFunc("/Yuls", app)
+	// opening the browers
+	go func() {
+		fmt.Println("Abriendo navegador/explorador Yuls...")
+		<-time.After(100 * time.Millisecond)
+		err := exec.Command("explorer", URL_SYSTEM_YULS).Run()
+		if err != nil {
+			fmt.Println("---------------------- Error --------------------")
+			log.Print(err)
+		}
+	}()
+	http.ListenAndServe(":"+port, nil)
 }

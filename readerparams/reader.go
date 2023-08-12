@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"os"
 )
 
@@ -50,9 +51,42 @@ func ReadConnectionMySqlParameters() (string, string, string, string, string, st
 	return username, password, typeConnection, server, port, database
 
 }
+func ReadDataInUsage() string {
+	file, err := initReader()
+	if err != nil {
+		fmt.Println("¡Error al leer parametros! ", err)
+	}
+	data := readParameters(file)
+	database := data["MysqlRemoteConnection"].(map[string]interface{})["Database"].(string)
+	defer file.Close()
+	return database
+}
+func ReadLocalNetwork() (string, string) {
+	file, err := initReader()
+	if err != nil {
+		fmt.Println("¡Error al leer parametros! ", err)
+	}
+	data := readParameters(file)
+	IP := data["LocalNetwork"].(map[string]interface{})["IP"].(string)
+	Port := data["LocalNetwork"].(map[string]interface{})["Port"].(string)
+	// testing if an IP is already set up
+	// if so, the system will take the local IP, if not, it will take the set up IP
+	if IP == "" || len(IP) <= 0 {
+		IP = getLocalIP()
+	}
+	return IP, Port
+}
 func readParameters(file *os.File) map[string]interface{} {
 	valuesinJson, _ := io.ReadAll(file)
 	var valuesFromJson map[string]interface{}
 	json.Unmarshal([]byte(valuesinJson), &valuesFromJson)
 	return valuesFromJson
+}
+func getLocalIP() string {
+	connection, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		return "127.0.0.1"
+	}
+	localAddress := connection.LocalAddr().(*net.UDPAddr)
+	return localAddress.IP.String()
 }
