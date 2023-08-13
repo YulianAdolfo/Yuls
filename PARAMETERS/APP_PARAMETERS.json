@@ -13,10 +13,15 @@
 	    "Password": "RegThisPatient.21Yuls*",
 	    "Database": "ipsucjyl_patient_clinic_history",
         "Table": "clinic_history",
+        "TableTest":"clinic_history_Test",
         "TypeConn": "tcp"
     },
     "LocalNetwork" : {
         "IP": "",
         "Port": "8005"
+    },
+    "Others": {
+        "BackupsPath" : "../backups",
+        "DownloadedReports": "../public/temporal"
     }
 }
