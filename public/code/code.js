@@ -366,6 +366,10 @@ function buttonSender() {
                 if (checkboxError.checked) {
                     patientErrors = true
                     descriptionError = reasonWhyErrorBox.value
+                    // in case of saving the problem description empty
+                    if(descriptionError.trim().length <= 0) {
+                        descriptionError = "Sin error especificado"
+                    }
                 } else {
                     patientErrors = false
                     descriptionError = ""
