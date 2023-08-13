@@ -334,17 +334,23 @@ function buttonSender() {
             case "6":
                 typeId = "NU"
                 break;
-            case "8":
+            case "7":
                 typeId = "PA"
                 break;
-            case "9":
+            case "8":
                 typeId = "PE"
                 break;
-            case "10":
+            case "9":
                 typeId = "RC"
                 break;
-            case "11":
+            case "10":
                 typeId = "RI"
+                break;
+            case "11":
+                typeId = "PEP"
+                break;
+            case "12":
+                typeId = "NIT"
                 break;
             default:
                 typeId = ""
