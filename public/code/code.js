@@ -18,17 +18,17 @@ var reasonWhyErrorBox = document.getElementById("reason-why-error")
 
 
 function initApp() {
-    if(localStorage.getItem("STATE-DB-HOSVITAL") == "offline") {
+    if (localStorage.getItem("STATE-DB-HOSVITAL") == "offline") {
         workingWithoutConnectionToHosvital("Estás trabajando sin conexión a Hosvital")
         checkboxNotConnectionHosvital.checked = true
-    }else {
+    } else {
         localStorage.setItem("STATE-DB-HOSVITAL", "online")
     }
 }
-checkboxError.onchange = ()=> {
-    if(checkboxError.checked){
+checkboxError.onchange = () => {
+    if (checkboxError.checked) {
         reasonWhyErrorBox.style.display = "inline"
-    }else {
+    } else {
         reasonWhyErrorBox.style.display = "none"
     }
 }
@@ -36,15 +36,15 @@ configConnection.onclick = () => {
     var connectionButton = document.getElementById("config-submenu")
     if (connectionButton.style.display == "" || connectionButton.style.display == "none") {
         connectionButton.style.display = "block"
-    }else {
+    } else {
         connectionButton.style.display = "none"
     }
 }
 checkboxNotConnectionHosvital.onclick = () => {
-    if(checkboxNotConnectionHosvital.checked) {
+    if (checkboxNotConnectionHosvital.checked) {
         workingWithoutConnectionToHosvital("Estás trabajando sin conexión a Hosvital")
         localStorage.setItem("STATE-DB-HOSVITAL", "offline")
-    }else { 
+    } else {
         workingWithoutConnectionToHosvital("")
         localStorage.setItem("STATE-DB-HOSVITAL", "online")
     }
@@ -120,7 +120,7 @@ generateReportButton.onclick = () => {
     div.appendChild(select)
     div.appendChild(checkPatientErrors)
     div.appendChild(button).innerHTML = "Generar reporte"
-    document.getElementById("return-arrow-1").onclick = () => {deleteActualWin(app, div), Mainform.style.display = "block"}
+    document.getElementById("return-arrow-1").onclick = () => { deleteActualWin(app, div), Mainform.style.display = "block" }
     app.style.height = "380px"
 
     button.onclick = async () => {
@@ -177,7 +177,7 @@ IdPatientBox.onchange = async () => {
     var stringIdQuery = IdPatientBox.value
     var getInfoPatient = null
     if (localStorage.getItem("STATE-DB-HOSVITAL") === "online") {
-        if (!isNaN(id) || stringIdQuery.substring(0,3) == "-n " && stringIdQuery.substring(3, stringIdQuery.length).length >= 3) {
+        if (!isNaN(id) || stringIdQuery.substring(0, 3) == "-n " && stringIdQuery.substring(3, stringIdQuery.length).length >= 3) {
             var stateMessage = " | consultando..."
             IdPatientBox.disabled = true
             IdPatientBox.style.backgroundColor = "rgba(1, 172, 240)"
@@ -194,42 +194,42 @@ IdPatientBox.onchange = async () => {
                             rejected(error)
                         })
                 })
-            }else {
+            } else {
                 var patientNameHosvital = stringIdQuery.substring(3, stringIdQuery.length)
                 getInfoPatient = await new Promise((resolved, rejected) => {
                     fetch("/data-patient-from-hosvital?username-patient=" + patientNameHosvital, {
                         method: "get"
                     })
-                    .then(resp => resp.json())
-                    .then(data => resolved(data))
-                    .catch(error => {
-                        rejected(error),
-                        alert(error)
+                        .then(resp => resp.json())
+                        .then(data => resolved(data))
+                        .catch(error => {
+                            rejected(error),
+                                alert(error)
 
-                    })
-                })            
+                        })
+                })
             }
-    
+
             stateMessage = ""
             IdPatientBox.disabled = false
             IdPatientBox.style.backgroundColor = "white"
             IdPatientBox.style.color = "black"
             if (!isNaN(id) && getInfoPatient.Names != "" && getInfoPatient.Lastnames != "") {
-                if(getInfoPatient.ContenMessage) {
+                if (getInfoPatient.ContenMessage) {
                     stateProcessAlert("fa-user-times", "Error Fatal de Conexión", "red")
-                    alert("Error fatal con conexión a Hosvital.\n"+
-                            getInfoPatient.ContenMessage+"\n"+
-                            "Lo más probable es que no haya una conexión con el servidor o que se haya perdido.\n"+
-                            "Para verificar este error vaya a su línea de comandos y realice un ping de conexión al servidor de base de datos.\n"+
-                            "Comuníquese con el área de sistemas para recibir soporte.")
-    
-                    alert("Si lo desea (recomendable) puede trabajar sin conexión a Hosvital, lo que indica que:\n"+
-                            "Tendrá que usted mismo (manualmente) ingresar el nombre y el apellido del paciente\n"+
-                            "Para activar esta función realice lo siguiente:\n"+
-                            "1- Vaya al menú\n" +
-                            "2- Click en configuración\n"+
-                            "3- Habilite la función de: Trabajar sin conexión a Hosvital")
-                }else {
+                    alert("Error fatal con conexión a Hosvital.\n" +
+                        getInfoPatient.ContenMessage + "\n" +
+                        "Lo más probable es que no haya una conexión con el servidor o que se haya perdido.\n" +
+                        "Para verificar este error vaya a su línea de comandos y realice un ping de conexión al servidor de base de datos.\n" +
+                        "Comuníquese con el área de sistemas para recibir soporte.")
+
+                    alert("Si lo desea (recomendable) puede trabajar sin conexión a Hosvital, lo que indica que:\n" +
+                        "Tendrá que usted mismo (manualmente) ingresar el nombre y el apellido del paciente\n" +
+                        "Para activar esta función realice lo siguiente:\n" +
+                        "1- Vaya al menú\n" +
+                        "2- Click en configuración\n" +
+                        "3- Habilite la función de: Trabajar sin conexión a Hosvital")
+                } else {
                     IdPatientBox.value = id
                     boxNames.value = getInfoPatient.Names
                     boxLastnames.value = getInfoPatient.Lastnames
@@ -240,22 +240,22 @@ IdPatientBox.onchange = async () => {
                     IdPatientBox.value = id
                     boxNames.value = ""
                     boxLastnames.value = ""
-                }else {
-                    var containerTableHosvitalByName =  document.getElementById("information-panel-hosvital-name")
+                } else {
+                    var containerTableHosvitalByName = document.getElementById("information-panel-hosvital-name")
                     var buttonBack = document.getElementById("arrow-back-hvt")
                     var table = document.getElementById("information-table-hosvital-name")
                     IdPatientBox.value = stringIdQuery.substring(3, stringIdQuery.length)
                     if (getInfoPatient != null) {
-                        for(var i = 0; i < getInfoPatient.length; i++) {
+                        for (var i = 0; i < getInfoPatient.length; i++) {
                             var tr = document.createElement("tr")
-                            for(var j =0; j < 3; j++) {
+                            for (var j = 0; j < 3; j++) {
                                 var td = document.createElement("td")
-                                switch(j) {
+                                switch (j) {
                                     case 0:
                                         td.innerHTML = getInfoPatient[i].MPCedu
                                         break;
                                     case 1:
-                                        td.innerHTML = getInfoPatient[i].MPNom1 +" "+getInfoPatient[i].MPApe1
+                                        td.innerHTML = getInfoPatient[i].MPNom1 + " " + getInfoPatient[i].MPApe1
                                         break;
                                     default:
                                         var icon = document.createElement("i")
@@ -263,21 +263,21 @@ IdPatientBox.onchange = async () => {
                                         icon.title = "Agregar al formulario"
                                         td.appendChild(icon)
                                         icon.onclick = (e) => {
-                                            var indexData =Array.from(table.children).indexOf(e.target.parentElement.parentElement)
-                                            var dataPatientSet = getInfoPatient[indexData-1]
+                                            var indexData = Array.from(table.children).indexOf(e.target.parentElement.parentElement)
+                                            var dataPatientSet = getInfoPatient[indexData - 1]
                                             IdPatientBox.value = dataPatientSet.MPCedu
                                             boxNames.value = dataPatientSet.MPNom1
                                             boxLastnames.value = dataPatientSet.MPApe1
                                             buttonBack.click()
                                         }
                                         break;
-                                    }
+                                }
                                 tr.appendChild(td)
                             }
                             table.appendChild(tr)
                         }
                         buttonBack.onclick = () => {
-                            while(table.children.length > 1) {
+                            while (table.children.length > 1) {
                                 table.removeChild(table.lastElementChild)
                             }
                             containerTableHosvitalByName.style.display = "none"
@@ -311,116 +311,121 @@ function buttonSender() {
         var lastnames = boxLastnames.value.toUpperCase()
         var dateHc = dateRegistry.value
         var patientErrors = checkboxError.value
-
-        switch (typeId) {
-            case "0":
-                typeId = "CC"
-                break;
-            case "1":
-                typeId = "TI"
-                break;
-            case "2":
-                typeId = "CE"
-                break;
-            case "3":
-                typeId = "ASI"
-                break;
-            case "4":
-                typeId = "CI"
-                break;
-            case "5":
-                typeId = "MSI"
-                break;
-            case "6":
-                typeId = "NU"
-                break;
-            case "7":
-                typeId = "PA"
-                break;
-            case "8":
-                typeId = "PE"
-                break;
-            case "9":
-                typeId = "RC"
-                break;
-            case "10":
-                typeId = "RI"
-                break;
-            case "11":
-                typeId = "PEP"
-                break;
-            case "12":
-                typeId = "NIT"
-                break;
-            default:
-                typeId = ""
-                break;
-        }
-        if (documentId != "" && documentId.length > 5 && names != "" && lastnames != "" && dateHc != "" && typeId != "") {
-            var descriptionError = 0
-            // checking if the patient has errors
-            if (checkboxError.checked) {
-                patientErrors = true
-                descriptionError = reasonWhyErrorBox.value
-            } else {
-                patientErrors = false
-                descriptionError = ""
-            }
-            // data in object
-            var recordDataPatient = {
-                idPatient: documentId,
-                patientNames: names,
-                patientLastnames: lastnames,
-                dateClinicHistory: dateHc,
-                typeId: typeId,
-                hasError: patientErrors,
-                DESCRIPTION_ERROR: descriptionError
-            }
-            // converting to json
-            var sendRecord = JSON.stringify(recordDataPatient)
-            async function sendRecordToServer() {
-                // setting the loading progress
-                onprogressRequest()
-                // sending the data
-                var stateRecord = await new Promise((recorded, rejected) => {
-                    fetch("/record-patient",
-                        {
-                            method: "post",
-                            headers: {
-                                "content-type": "application/json"
-                            },
-                            body: sendRecord
-                        })
-                        .then(resp => resp.json())
-                        .then(data => recorded(data))
-                        .catch(error => rejected(error))
-                })
-                stateRecord = stateRecord.ContenMessage
-                if (stateRecord == "already registered") {
-                    stateProcessAlert("fa-user-times", "Usuario existente, se ha denegado el registro", "red")
-                } else if (stateRecord.includes("dial tcp: i/o timeout")) {
-                    stateProcessAlert("fa-user-times", "Lo sentimos, inténtelo nuevamente (dial/tcp)", "red")
-                } else if (stateRecord.includes("denied")){
-                    alert("ACCESO DENEGADO AL SISTEMA: NO SE PUEDE REGISTRAR\nCOMUNICARSE CON EL AREA DE SISTEMAS")
-                }else if (stateRecord.includes("already")) {
-                    alert("El paciente NO se pudo registar, se ha alcanzado el límite máximo de conexiones, ")
-                }else {
-                    if (stateRecord == "successful") {
-                        stateProcessAlert("fa-user-check", "Registro éxitoso", "limegreen")
-                        hideSpecificBoxError()
-                    }
-                }
-                IdPatientBox.value = ""
-                boxNames.value = ""
-                boxLastnames.value = ""
-                checkboxError.value = ""
-                checkboxError.checked = false
-                buttonSender()
-                removeLastElement()
-            }
-            sendRecordToServer()
+        if (documentId.length > 15 || names.length >= 29 || lastnames.length >= 29 || patientErrors.length >= 199) {
+            alert("Error: algunos campos superan el límite máximo de carateres permitidos para el registro, por favor verfique.\nComúniquese con el departamento de sistemas para recibir asistencia.")
         } else {
-            stateProcessAlert("fa-info-circle", "Faltan campos por llenar, por favor verifique", "orange")
+
+            switch (typeId) {
+                case "0":
+                    typeId = "CC"
+                    break;
+                case "1":
+                    typeId = "TI"
+                    break;
+                case "2":
+                    typeId = "CE"
+                    break;
+                case "3":
+                    typeId = "ASI"
+                    break;
+                case "4":
+                    typeId = "CI"
+                    break;
+                case "5":
+                    typeId = "MSI"
+                    break;
+                case "6":
+                    typeId = "NU"
+                    break;
+                case "7":
+                    typeId = "PA"
+                    break;
+                case "8":
+                    typeId = "PE"
+                    break;
+                case "9":
+                    typeId = "RC"
+                    break;
+                case "10":
+                    typeId = "RI"
+                    break;
+                case "11":
+                    typeId = "PEP"
+                    break;
+                case "12":
+                    typeId = "NIT"
+                    break;
+
+                default:
+                    typeId = ""
+                    break;
+            }
+            if (documentId != "" && documentId.length > 5 && names != "" && lastnames != "" && dateHc != "" && typeId != "") {
+                var descriptionError = 0
+                // checking if the patient has errors
+                if (checkboxError.checked) {
+                    patientErrors = true
+                    descriptionError = reasonWhyErrorBox.value
+                } else {
+                    patientErrors = false
+                    descriptionError = ""
+                }
+                // data in object
+                var recordDataPatient = {
+                    idPatient: documentId,
+                    patientNames: names,
+                    patientLastnames: lastnames,
+                    dateClinicHistory: dateHc,
+                    typeId: typeId,
+                    hasError: patientErrors,
+                    DESCRIPTION_ERROR: descriptionError
+                }
+                // converting to json
+                var sendRecord = JSON.stringify(recordDataPatient)
+                async function sendRecordToServer() {
+                    // setting the loading progress
+                    onprogressRequest()
+                    // sending the data
+                    var stateRecord = await new Promise((recorded, rejected) => {
+                        fetch("/record-patient",
+                            {
+                                method: "post",
+                                headers: {
+                                    "content-type": "application/json"
+                                },
+                                body: sendRecord
+                            })
+                            .then(resp => resp.json())
+                            .then(data => recorded(data))
+                            .catch(error => rejected(error))
+                    })
+                    stateRecord = stateRecord.ContenMessage
+                    if (stateRecord == "already registered") {
+                        stateProcessAlert("fa-user-times", "Usuario existente, se ha denegado el registro", "red")
+                    } else if (stateRecord.includes("dial tcp: i/o timeout")) {
+                        stateProcessAlert("fa-user-times", "Lo sentimos, inténtelo nuevamente (dial/tcp)", "red")
+                    } else if (stateRecord.includes("denied")) {
+                        alert("ACCESO DENEGADO AL SISTEMA: NO SE PUEDE REGISTRAR\nCOMUNICARSE CON EL AREA DE SISTEMAS")
+                    } else if (stateRecord.includes("already")) {
+                        alert("El paciente NO se pudo registar, se ha alcanzado el límite máximo de conexiones, ")
+                    } else {
+                        if (stateRecord == "successful") {
+                            stateProcessAlert("fa-user-check", "Registro éxitoso", "limegreen")
+                            hideSpecificBoxError()
+                        }
+                    }
+                    IdPatientBox.value = ""
+                    boxNames.value = ""
+                    boxLastnames.value = ""
+                    checkboxError.value = ""
+                    checkboxError.checked = false
+                    buttonSender()
+                    removeLastElement()
+                }
+                sendRecordToServer()
+            } else {
+                stateProcessAlert("fa-info-circle", "Faltan campos por llenar, por favor verifique", "orange")
+            }
         }
     }
 }
@@ -510,12 +515,12 @@ function iconHeader(state) {
     icon[1].children[0].style.display = state
 }
 function tableInfo(contentQuery) {
-    if (contentQuery != null && (contentQuery.length-1) > 0) {
+    if (contentQuery != null && (contentQuery.length - 1) > 0) {
         var buttonDownload = document.getElementById("download-report")
         var table = document.getElementById("table-info-view-patient")
         var closeInfo = document.getElementById("close-modal-info")
         // the last one element id makes reference to the amount of registries in DB
-        for (var i = 0; i < contentQuery.length-1; i++) {
+        for (var i = 0; i < contentQuery.length - 1; i++) {
             var tr = document.createElement("tr")
             var data = JSON.parse(contentQuery[i])
             for (var j = 0; j < 6; j++) {
@@ -567,8 +572,8 @@ function tableInfo(contentQuery) {
             buttonDownload.style.backgroundColor = "rgb(30, 219, 5)"
             buttonDownload.disabled = false
         }
-        var amountPatients = JSON.parse(contentQuery[contentQuery.length-1])
-        document.getElementById("amount-patients").innerHTML = contentQuery.length-1 + "/"+ amountPatients + " registros"
+        var amountPatients = JSON.parse(contentQuery[contentQuery.length - 1])
+        document.getElementById("amount-patients").innerHTML = contentQuery.length - 1 + "/" + amountPatients + " registros"
     } else {
         stateProcessAlert("fa-address-book", "No se han encontrado registros", "rgb(243, 98, 1)")
     }
