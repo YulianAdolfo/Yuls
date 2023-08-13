@@ -48,7 +48,7 @@ type setDataExcel struct {
 
 var DATABASE_IN_USE string
 
-//var BACKUP_FILE_NAME = getFilenameBackups() + getDate() + getExt()
+var BACKUP_FILE_NAME = getFilenameBackups() + getDate() + getExt()
 
 const VERSION = "1.3.3"
 
@@ -60,7 +60,7 @@ func backup(dataPatienStruct dataPatientHC) {
 	}
 }
 func newClinicHistory(dataPatienStruct dataPatientHC) error {
-	//go backup(dataPatienStruct)
+	go backup(dataPatienStruct)
 	connection := getConnectionDB()
 	knowExistancePatient := thisPatientExists(dataPatienStruct.IdPatient)
 	if knowExistancePatient != 1 {
@@ -478,7 +478,11 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 			case 5:
 				contentString = dataPatientExcel.PatientLastnames
 			case 6:
-				contentString = "-"
+				if dataPatientExcel.HasError {
+					contentString = "SI"
+				} else {
+					contentString = "NO"
+				}
 			case 7:
 				contentString = strconv.Itoa(dataPatientExcel.IDPTN)
 			case 8:
@@ -496,15 +500,6 @@ func createExcelReport(contentData setDataExcel) (string, error) {
 	}
 	return reportInExcel.Path, err
 }
-func readDBInUse() string {
-	fmt.Println("Leyendo base de datos para uso")
-	choicedDB, err := ioutil.ReadFile("../PARAMETERS/DB_PRODUCTION.txt")
-	if err != nil {
-		log.Print(err)
-		os.Exit(1)
-	}
-	return string(choicedDB)
-}
 func getDate() string {
 	return time.Now().Format("01-02-2006")
 }
@@ -518,7 +513,7 @@ func getPathBackup() string {
 	return "../backups/"
 }
 func saveDataInLocalBackup(data string) error {
-	/* file, err := os.OpenFile(getPathBackup()+"/"+BACKUP_FILE_NAME, os.O_APPEND|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(getPathBackup()+"/"+BACKUP_FILE_NAME, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Print("Error: " + err.Error())
 		return err
@@ -528,18 +523,29 @@ func saveDataInLocalBackup(data string) error {
 	if _, err := file.WriteString(data); err != nil {
 		return err
 	}
-	return nil */
 	return nil
 }
+func initBackupSystem() {
+	_, err := os.Stat(getPathBackup() + "/" + BACKUP_FILE_NAME)
+	if os.IsNotExist(err) {
+		fmt.Println("Yuls: archivo de backups no exite, creando archivo...")
+		_, err := os.Create(getPathBackup() + "/" + BACKUP_FILE_NAME)
+		if err != nil {
+			log.Print("Error al crear el archivo de backups: " + err.Error())
+		}
+		fmt.Println("Yuls: archivo creado con éxito")
+	}
+}
 func main() {
-	fmt.Println("Preparando a Yuls, por favor espere...")
-	fmt.Println("Leyendo parametros de conexión Yuls...")
+	fmt.Println("Yuls: preparando todo...")
+	initBackupSystem()
 	IP, port := readerparams.ReadLocalNetwork()
 	DATABASE_IN_USE = readerparams.ReadDataInUsage()
+	fmt.Println("Yuls: obteniendo dirección de IP local...")
 	URL_SYSTEM_YULS := fmt.Sprintf("http://%s:%s/Yuls", IP, port)
 	publicElementsApp := http.FileServer(http.Dir("../public"))
 	http.Handle("/public/", http.StripPrefix("/public/", publicElementsApp))
-	fmt.Println("Usando la base de datos: " + DATABASE_IN_USE)
+	fmt.Println("Yuls: usando la base de datos en remoto: " + DATABASE_IN_USE)
 	http.HandleFunc("/record-patient", setPatientRecord)
 	http.HandleFunc("/get-data-patient", patientHosvital)
 	http.HandleFunc("/get-information-from-patient", getReport)
@@ -549,7 +555,7 @@ func main() {
 	http.HandleFunc("/Yuls", app)
 	// opening the browers
 	go func() {
-		fmt.Println("Abriendo navegador/explorador Yuls...")
+		fmt.Println("Yuls: abriendo navegador/explorador...")
 		<-time.After(100 * time.Millisecond)
 		err := exec.Command("explorer", URL_SYSTEM_YULS).Run()
 		if err != nil {
