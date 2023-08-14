@@ -50,7 +50,7 @@ var DATABASE_IN_USE string
 
 var BACKUP_FILE_NAME = getFilenameBackups() + getDate() + getExt()
 
-const VERSION = "1.3.3"
+const VERSION = "2.0.0"
 
 // insert new patients
 func backup(dataPatienStruct dataPatientHC) {
