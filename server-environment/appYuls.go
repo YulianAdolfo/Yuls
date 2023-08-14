@@ -555,6 +555,7 @@ func main() {
 	// opening the browers
 	go func() {
 		fmt.Println("Yuls: abriendo navegador/explorador...")
+		fmt.Println("Powered by: Yulian Adolfo Rojas - IPS Universitaria de Caldas -  2023")
 		<-time.After(100 * time.Millisecond)
 		err := exec.Command("explorer", URL_SYSTEM_YULS).Run()
 		if err != nil {
