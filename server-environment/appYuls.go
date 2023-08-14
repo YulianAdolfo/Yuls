@@ -184,7 +184,6 @@ func app(w http.ResponseWriter, r *http.Request) {
 	appTemplate.Execute(w, developerName)
 }
 func getInfoPatientFromHosvitalTest(id string, connectionSqlServer *sql.DB) (string, error) {
-	fmt.Println("se va a buscar el valor " + id)
 	contextConnection := context.Background()
 	// check if the connection is alive
 	err := connectionSqlServer.PingContext(contextConnection)
